@@ -36,7 +36,7 @@ class SettingsItem extends StatelessWidget {
       title: title,
       description: description,
       inBlock: inBlock,
-      trailing: CustomSwitch(
+      trailing: YicoreSwitch(
         value: value,
         onChanged: onChanged,
       ),
@@ -93,7 +93,7 @@ class SettingsItem extends StatelessWidget {
       title: title,
       description: description,
       inBlock: inBlock,
-      trailing: CustomSlider(
+      trailing: YicoreSlider(
         value: value,
         min: min,
         max: max,

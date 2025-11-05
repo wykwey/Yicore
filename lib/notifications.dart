@@ -314,7 +314,7 @@ class _NotificationCardState extends State<_NotificationCard>
   }
 
   Widget _buildActionButton() {
-    return CustomButton(
+    return YicoreButton(
       text: widget.actionText!,
       isOutlined: true,
       padding: EdgeInsets.symmetric(

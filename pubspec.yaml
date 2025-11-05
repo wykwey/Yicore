@@ -1,7 +1,7 @@
-name: yiclass
-description: 一个课表管理工具，支持多种课程表格式导入，支持多种平台。
+name: Yicore
+description: Yicore是为 YiClass 课表项目打造的轻量级 Flutter 组件库
 
-version: 2.1.0+1
+version: 1.0.2
 
 environment:
   sdk: ">=3.5.0 <4.0.0"

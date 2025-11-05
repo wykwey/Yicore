@@ -8,18 +8,19 @@ Yicore 是一个课表管理工具，支持多种课程表格式导入，支持�
 
 ## 版本信息
 
-- **当前版本**: 1.0.1
+- **当前版本**: 2.1.0+1
 - **Flutter SDK**: >=3.5.0 <4.0.0
 
 ## 功能特性
 
 ### 基础组件
 
-- **CustomButton** - 自定义按钮（支持主要、次要、轮廓、加载状态）
-- **CustomTextField** - 自定义输入框（支持标签、提示、错误状态）
-- **CustomSwitch** - 自定义开关
-- **CustomSlider** - 自定义滑块
-- **CustomCard** - 自定义卡片容器
+- **YicoreButton** - 自定义按钮（支持主要、次要、轮廓、加载状态）
+- **YicoreTextField** - 自定义输入框（支持标签、提示、错误状态）
+- **YicoreSwitch** - 自定义开关
+- **YicoreSlider** - 自定义滑块
+- **YicoreCard** - 自定义卡片容器
+- **YicoreFab** - 悬浮窗按钮（支持自定义图标、颜色、大小）
 
 ### 设置组件
 
@@ -28,10 +29,10 @@ Yicore 是一个课表管理工具，支持多种课程表格式导入，支持�
 
 ### 对话框组件
 
-- **CustomAlert** - 提示对话框
-- **CustomConfirm** - 确认对话框
-- **CustomModal** - 模态对话框
-- **CustomAnnouncement** - 公告对话框
+- **YicoreAlert** - 提示对话框
+- **YicoreConfirm** - 确认对话框
+- **YicoreModal** - 模态对话框
+- **YicoreAnnouncement** - 公告对话框
 
 ### 通知组件
 
@@ -39,13 +40,13 @@ Yicore 是一个课表管理工具，支持多种课程表格式导入，支持�
 
 ### 导航组件
 
-- **CustomBottomNavigationBar** - 自定义底部导航栏，带平滑动画效果
+- **YicoreBottomNavigationBar** - 自定义底部导航栏，带平滑动画效果
 
 ### 日期时间组件
 
-- **CustomDatePicker** - 日期选择器
-- **CustomDatePickerButton** - 日期选择按钮
-- **CustomTimeRangePicker** - 时间范围选择器（底部弹窗，格式：HH:mm-HH:mm）
+- **YicoreDatePicker** - 日期选择器
+- **YicoreDatePickerButton** - 日期选择按钮
+- **YicoreTimePicker** - 时间范围选择器（底部弹窗，格式：HH:mm-HH:mm）
 
 ## 项目结构
 
@@ -59,7 +60,7 @@ lib/
 ├── notifications.dart     # 通知组件
 ├── navigation.dart        # 导航组件
 ├── datepicker.dart        # 日期选择器
-└── time_range_picker.dart # 时间范围选择器
+└── timepicker.dart        # 时间范围选择器
 ```
 
 ## 快速开始
@@ -103,20 +104,20 @@ flutter build linux
 ### 按钮组件
 
 ```dart
-CustomButton(
+YicoreButton(
   text: '主要按钮',
   onPressed: () {
     // 处理点击事件
   },
 )
 
-CustomButton(
+YicoreButton(
   text: '次要按钮',
   isSecondary: true,
   onPressed: () {},
 )
 
-CustomButton(
+YicoreButton(
   text: '轮廓按钮',
   isOutlined: true,
   onPressed: () {},
@@ -126,12 +127,43 @@ CustomButton(
 ### 日期选择器
 
 ```dart
-CustomDatePicker.show(
+YicoreDatePicker.show(
   context: context,
   initialDate: DateTime.now(),
   onDateSelected: (date) {
     print('选择的日期: $date');
   },
+)
+```
+
+### 悬浮窗按钮
+
+```dart
+// 在 Stack 中使用
+Stack(
+  children: [
+    // 你的内容
+    Positioned(
+      bottom: 24,
+      right: 24,
+      child: YicoreFab(
+        icon: Icons.add,
+        tooltip: '添加',
+        onPressed: () {
+          // 处理点击事件
+        },
+      ),
+    ),
+  ],
+)
+
+// 自定义颜色和大小
+YicoreFab(
+  icon: Icons.favorite,
+  size: 56,
+  backgroundColor: Colors.red,
+  foregroundColor: Colors.white,
+  onPressed: () {},
 )
 ```
 
@@ -153,14 +185,14 @@ Notifications.sonner(
 
 ```dart
 // Alert 提示
-CustomAlert.show(
+YicoreAlert.show(
   context,
   title: '提示',
   message: '这是一个提示对话框',
 )
 
 // Confirm 确认
-final result = await CustomConfirm.show(
+final result = await YicoreConfirm.show(
   context,
   title: '确认操作',
   message: '确定要执行此操作吗？',
@@ -193,3 +225,5 @@ final result = await CustomConfirm.show(
 
 ### v1.0.1
 - 初次创建组件并上传
+### v1.0.2
+- 增加悬浮按钮

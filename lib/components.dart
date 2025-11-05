@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 // ================== 自定义开关 ==================
-class CustomSwitch extends StatelessWidget {
+class YicoreSwitch extends StatelessWidget {
   final bool value;
   final ValueChanged<bool> onChanged;
 
-  const CustomSwitch({required this.value, required this.onChanged, Key? key})
+  const YicoreSwitch({required this.value, required this.onChanged, Key? key})
       : super(key: key);
 
   @override
@@ -39,13 +39,13 @@ class CustomSwitch extends StatelessWidget {
 }
 
 // ================== 自定义滑块 ==================
-class CustomSlider extends StatelessWidget {
+class YicoreSlider extends StatelessWidget {
   final double value;
   final double min;
   final double max;
   final ValueChanged<double> onChanged;
 
-  const CustomSlider({
+  const YicoreSlider({
     required this.value,
     required this.min,
     required this.max,
@@ -120,7 +120,7 @@ class CustomSlider extends StatelessWidget {
 }
 
 // ================== 自定义按钮 ==================
-class CustomButton extends StatefulWidget {
+class YicoreButton extends StatefulWidget {
   final String text;
   final VoidCallback? onPressed;
   final bool isLoading;
@@ -131,7 +131,7 @@ class CustomButton extends StatefulWidget {
   final EdgeInsets? padding;
   final double? width;
 
-  const CustomButton({
+  const YicoreButton({
     required this.text,
     this.onPressed,
     this.isLoading = false,
@@ -145,10 +145,10 @@ class CustomButton extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _CustomButtonState createState() => _CustomButtonState();
+  _YicoreButtonState createState() => _YicoreButtonState();
 }
 
-class _CustomButtonState extends State<CustomButton>
+class _YicoreButtonState extends State<YicoreButton>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
@@ -289,7 +289,7 @@ class _CustomButtonState extends State<CustomButton>
 }
 
 // ================== 自定义输入框 ==================
-class CustomTextField extends StatelessWidget {
+class YicoreTextField extends StatelessWidget {
   final String? hintText;
   final String? labelText;
   final TextEditingController? controller;
@@ -298,7 +298,7 @@ class CustomTextField extends StatelessWidget {
   final bool enabled;
   final String? errorText;
 
-  const CustomTextField({
+  const YicoreTextField({
     this.hintText,
     this.labelText,
     this.controller,

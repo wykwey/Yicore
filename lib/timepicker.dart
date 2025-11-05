@@ -16,10 +16,11 @@ class TimeRange {
   });
 
   String format() =>
-      '${startHour.toString().padLeft(2, '0')}:${startMinute.toString().padLeft(2, '0')}-${endHour.toString().padLeft(2, '0')}:${endMinute.toString().padLeft(2, '0')}';
+      '${startHour.toString().padLeft(2, '0')}:${startMinute.toString().padLeft(2, '0')}'
+      '-${endHour.toString().padLeft(2, '0')}:${endMinute.toString().padLeft(2, '0')}';
 }
 
-class CustomTimeRangePicker {
+class YicoreTimeRangePicker {
   static Future<TimeRange?> show({
     required BuildContext context,
     TimeRange? initial,
@@ -29,7 +30,7 @@ class CustomTimeRangePicker {
     final result = await showModalBottomSheet<TimeRange>(
       context: context,
       isScrollControlled: true,
-      enableDrag: false,
+      enableDrag: true, // ✅ 保持可手势拖拽
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
@@ -51,8 +52,8 @@ class _TimeRangeSheet extends StatefulWidget {
 }
 
 class _TimeRangeSheetState extends State<_TimeRangeSheet> {
-  static const double _itemExtent = 44;
-  static const double _visibleCount = 7; // 上下各3个 + 中间1个
+  static const double _itemExtent = 56; // 每项高度
+  static const double _visibleCount = 3; // 可见项数
 
   late FixedExtentScrollController _sh;
   late FixedExtentScrollController _sm;
@@ -94,24 +95,33 @@ class _TimeRangeSheetState extends State<_TimeRangeSheet> {
     required ValueChanged<int> onSelected,
   }) {
     return SizedBox(
-      height: _itemExtent * _visibleCount, 
-      width: 72,
-      child: ListWheelScrollView.useDelegate(
-        controller: controller,
-        itemExtent: _itemExtent,
-        physics: const FixedExtentScrollPhysics(),
-        onSelectedItemChanged: onSelected,
-        childDelegate: ListWheelChildBuilderDelegate(
-          builder: (context, index) {
-            if (index < 0 || index >= count) return null;
-            return Center(
-              child: Text(
-                index.toString().padLeft(2, '0'),
-                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
-              ),
-            );
-          },
-          childCount: count,
+      height: _itemExtent * _visibleCount,
+      width: 68, // 缩小一点防止超宽
+      child: Listener(
+        behavior: HitTestBehavior.opaque,
+        onPointerSignal: (_) {}, // 修复手势事件冲突
+        child: ListWheelScrollView.useDelegate(
+          controller: controller,
+          itemExtent: _itemExtent,
+          physics: const FixedExtentScrollPhysics(),
+          onSelectedItemChanged: onSelected,
+          perspective: 0.002,
+          childDelegate: ListWheelChildBuilderDelegate(
+            builder: (context, index) {
+              if (index < 0 || index >= count) return null;
+              return Center(
+                child: Text(
+                  index.toString().padLeft(2, '0'),
+                  style: const TextStyle(
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+              );
+            },
+            childCount: count,
+          ),
         ),
       ),
     );
@@ -122,21 +132,65 @@ class _TimeRangeSheetState extends State<_TimeRangeSheet> {
     return SafeArea(
       top: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            const Text(
+              '选择时间范围',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+            const SizedBox(height: 20),
+            // ===== 滚轮区域 =====
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                CustomButton(
+                _wheel(
+                    count: 24,
+                    controller: _sh,
+                    onSelected: (i) => _startHour = i),
+                const SizedBox(width: 4),
+                const Text(':',
+                    style:
+                        TextStyle(fontSize: 26, fontWeight: FontWeight.w500)),
+                const SizedBox(width: 4),
+                _wheel(
+                    count: 60,
+                    controller: _sm,
+                    onSelected: (i) => _startMinute = i),
+                const SizedBox(width: 10),
+                const Text('-',
+                    style:
+                        TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
+                const SizedBox(width: 10),
+                _wheel(
+                    count: 24,
+                    controller: _eh,
+                    onSelected: (i) => _endHour = i),
+                const SizedBox(width: 4),
+                const Text(':',
+                    style:
+                        TextStyle(fontSize: 26, fontWeight: FontWeight.w500)),
+                const SizedBox(width: 4),
+                _wheel(
+                    count: 60,
+                    controller: _em,
+                    onSelected: (i) => _endMinute = i),
+              ],
+            ),
+            const SizedBox(height: 28),
+            // ===== 底部按钮 =====
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                YicoreButton(
                   text: '取消',
                   isOutlined: true,
                   onPressed: () => Navigator.pop(context),
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                 ),
-                const Text('选择时间范围', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                CustomButton(
+                YicoreButton(
                   text: '确定',
                   onPressed: () {
                     final startTotal = _startHour * 60 + _startMinute;
@@ -157,23 +211,9 @@ class _TimeRangeSheetState extends State<_TimeRangeSheet> {
                       ),
                     );
                   },
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
                 ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _wheel(count: 24, controller: _sh, onSelected: (i) => _startHour = i),
-                const Text(':', style: TextStyle(fontSize: 18)),
-                _wheel(count: 60, controller: _sm, onSelected: (i) => _startMinute = i),
-                const SizedBox(width: 16),
-                const Text('-', style: TextStyle(fontSize: 18)),
-                const SizedBox(width: 16),
-                _wheel(count: 24, controller: _eh, onSelected: (i) => _endHour = i),
-                const Text(':', style: TextStyle(fontSize: 18)),
-                _wheel(count: 60, controller: _em, onSelected: (i) => _endMinute = i),
               ],
             ),
           ],
@@ -182,5 +222,3 @@ class _TimeRangeSheetState extends State<_TimeRangeSheet> {
     );
   }
 }
-
-

@@ -117,7 +117,7 @@ Dialog _modalDialog(
 }
 
 // ================== Alert 对话框 ==================
-class CustomAlert {
+class YicoreAlert {
   static Future<void> show(
     BuildContext context, {
     required String title,
@@ -134,7 +134,7 @@ class CustomAlert {
       actionsBuilder: (dialogContext) => [
         Padding(
           padding: EdgeInsets.only(right: 8, bottom: 8),
-          child: CustomButton(
+          child: YicoreButton(
             text: confirmText ?? '确定',
             onPressed: () {
               Navigator.of(dialogContext, rootNavigator: true).pop();
@@ -148,7 +148,7 @@ class CustomAlert {
 }
 
 // ================== Confirm 确认对话框 ==================
-class CustomConfirm {
+class YicoreConfirm {
   static Future<bool> show(
     BuildContext context, {
     required String title,
@@ -167,7 +167,7 @@ class CustomConfirm {
       actionsBuilder: (dialogContext) => [
         Padding(
           padding: EdgeInsets.only(right: 8, bottom: 8),
-          child: CustomButton(
+          child: YicoreButton(
             text: cancelText ?? '取消',
             isOutlined: true,
             onPressed: () {
@@ -178,7 +178,7 @@ class CustomConfirm {
         ),
         Padding(
           padding: EdgeInsets.only(right: 8, bottom: 8),
-          child: CustomButton(
+          child: YicoreButton(
             text: confirmText ?? '确定',
             onPressed: () {
               Navigator.of(dialogContext, rootNavigator: true).pop(true);
@@ -193,7 +193,7 @@ class CustomConfirm {
 }
 
 // ================== Modal 模态对话框 ==================
-class CustomModal {
+class YicoreModal {
   static Future<T?> show<T>(
     BuildContext context, {
     required Widget child,
@@ -225,7 +225,7 @@ class CustomModal {
 }
 
 // ================== 公告对话框 ==================
-class CustomAnnouncement {
+class YicoreAnnouncement {
   static Future<void> show(
     BuildContext context, {
     required String title,
@@ -244,7 +244,7 @@ class CustomAnnouncement {
       actionsBuilder: (dialogContext) => [
         Padding(
           padding: EdgeInsets.only(right: 8, bottom: 8),
-          child: CustomButton(
+          child: YicoreButton(
             text: secondaryText,
             isOutlined: true,
             onPressed: () {
@@ -255,7 +255,7 @@ class CustomAnnouncement {
         ),
         Padding(
           padding: EdgeInsets.only(right: 8, bottom: 8),
-          child: CustomButton(
+          child: YicoreButton(
             text: primaryText,
             onPressed: () {
               Navigator.of(dialogContext, rootNavigator: true).pop();

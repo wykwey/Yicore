@@ -6,7 +6,8 @@ import 'cards.dart';
 import 'settingscard.dart';
 import 'dialogs.dart';
 import 'datepicker.dart';
-import 'time_range_picker.dart';
+import 'timepicker.dart';
+import 'fab.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -31,43 +32,94 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(0xFFF7F7F7),
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(height: 20),
-            if (_currentIndex == 0) ...[
-              // 基础组件
-              _buildSettingsBlockDemo(),
-              SizedBox(height: 50),
-              _buildSliderDemo(),
-              SizedBox(height: 50),
-              _buildCardDemo(),
-              SizedBox(height: 50),
-              _buildButtonDemo(),
-              SizedBox(height: 50),
-              _buildTextFieldDemo(),
-            ] else if (_currentIndex == 1) ...[
-              // 进阶组件
-              _buildNotificationDemo(),
-              SizedBox(height: 50),
-              _buildDialogDemo(),
-              SizedBox(height: 50),
-              _buildDatePickerDemo(),
-            SizedBox(height: 50),
-            _buildTimeRangePickerDemo(),
-            ] else if (_currentIndex == 2) ...[
-              // 高级组件
-              _buildNavigationDemo(),
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(height: 20),
+                if (_currentIndex == 0) ...[
+                  // 基础组件
+                  _buildSettingsBlockDemo(),
+                  SizedBox(height: 50),
+                  _buildSliderDemo(),
+                  SizedBox(height: 50),
+                  _buildCardDemo(),
+                  SizedBox(height: 50),
+                  _buildButtonDemo(),
+                  SizedBox(height: 50),
+                  _buildTextFieldDemo(),
+                  SizedBox(height: 50),
+                  _buildFloatingActionButtonDemo(),
+                ] else if (_currentIndex == 1) ...[
+                  // 进阶组件
+                  _buildNotificationDemo(),
+                  SizedBox(height: 50),
+                  _buildDialogDemo(),
+                  SizedBox(height: 50),
+                  _buildDatePickerDemo(),
+                  SizedBox(height: 50),
+                  _buildTimeRangePickerDemo(),
+                ] else if (_currentIndex == 2) ...[
+                  // 高级组件
+                  _buildNavigationDemo(),
+                ],
+                SizedBox(height: 100),
+              ],
+            ),
+          ),
+          // 悬浮窗按钮演示
+          YicoreFab(
+            icon: Icons.add,
+            tooltip: '点击展开菜单，长按拖动',
+            draggable: true,
+            menuItems: [
+              YicoreFloatingActionMenuItem(
+                icon: Icons.edit,
+                label: '编辑',
+                onPressed: () {
+                  Notifications.sonner(
+                    context,
+                    message: '点击了编辑',
+                  );
+                },
+              ),
+              YicoreFloatingActionMenuItem(
+                icon: Icons.favorite,
+                label: '收藏',
+                backgroundColor: Colors.red.withValues(alpha: 0.1),
+                onPressed: () {
+                  Notifications.sonner(
+                    context,
+                    message: '点击了收藏',
+                  );
+                },
+              ),
+              YicoreFloatingActionMenuItem(
+                icon: Icons.share,
+                label: '分享',
+                onPressed: () {
+                  Notifications.sonner(
+                    context,
+                    message: '点击了分享',
+                  );
+                },
+              ),
             ],
-            SizedBox(height: 50),
-          ],
-        ),
+            onPressed: () {
+              Notifications.sonner(
+                context,
+                message: '点击了主按钮',
+              );
+            },
+          ),
+        ],
       ),
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: EdgeInsets.all(16),
-          child: CustomBottomNavigationBar(
+          child: YicoreBottomNavigationBar(
             currentIndex: _currentIndex,
             onTap: (index) => setState(() => _currentIndex = index),
             items: [
@@ -152,7 +204,7 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
                 title: '关于我们',
                 description: '查看应用信息和版本',
                 onTap: () {
-                  CustomAlert.show(
+                  YicoreAlert.show(
                     context,
                     title: '关于我们',
                     message: 'YIClass v2.1.0\n\n一个课表管理工具，支持多种课程表格式导入，支持多种平台。',
@@ -164,7 +216,7 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
                 title: '退出登录',
                 description: '退出当前账户',
                 onTap: () {
-                  CustomConfirm.show(
+                  YicoreConfirm.show(
                     context,
                     title: '退出登录',
                     message: '确定要退出登录吗？',
@@ -197,7 +249,7 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
             subtitle: '自定义滑块样式',
           ),
           SizedBox(height: 20),
-          CustomSlider(
+          YicoreSlider(
             value: _sliderValue,
             min: 0,
             max: 100,
@@ -230,7 +282,7 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
             subtitle: '自定义卡片样式',
           ),
           SizedBox(height: 20),
-          CustomCard(
+          YicoreCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -254,7 +306,7 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
                 SizedBox(height: 16),
                 Row(
                   children: [
-                    CustomSwitch(
+                    YicoreSwitch(
                       value: _switchValue,
                       onChanged: (val) => setState(() => _switchValue = val),
                     ),
@@ -290,21 +342,21 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
             runSpacing: 12,
             alignment: WrapAlignment.start,
             children: [
-              CustomButton(
+              YicoreButton(
                 text: '主要按钮',
                 onPressed: () {},
               ),
-              CustomButton(
+              YicoreButton(
                 text: '次要按钮',
                 isSecondary: true,
                 onPressed: () {},
               ),
-              CustomButton(
+              YicoreButton(
                 text: '轮廓按钮',
                 isOutlined: true,
                 onPressed: () {},
               ),
-              CustomButton(
+              YicoreButton(
                 text: '加载中',
                 isLoading: true,
                 onPressed: () {},
@@ -328,21 +380,99 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
             subtitle: '自定义输入框样式',
           ),
           SizedBox(height: 20),
-          CustomTextField(
+          YicoreTextField(
             labelText: '用户名',
             hintText: '请输入用户名',
           ),
           SizedBox(height: 16),
-          CustomTextField(
+          YicoreTextField(
             labelText: '禁用状态',
             hintText: '此输入框已禁用',
             enabled: false,
           ),
           SizedBox(height: 16),
-          CustomTextField(
+          YicoreTextField(
             labelText: '错误状态',
             hintText: '请输入内容',
             errorText: '此字段为必填项',
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ================== 悬浮窗按钮组件演示 ==================
+  Widget _buildFloatingActionButtonDemo() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionTitle(
+            title: '悬浮窗按钮',
+            subtitle: '自定义悬浮按钮样式',
+          ),
+          SizedBox(height: 20),
+          YicoreCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '悬浮按钮说明',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                  ),
+                ),
+                SizedBox(height: 12),
+                Text(
+                  '悬浮窗按钮位于页面右下角，点击可触发操作。支持自定义图标、颜色和大小。',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[700],
+                    height: 1.5,
+                  ),
+                ),
+                SizedBox(height: 16),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    _FABDemoItem(
+                      icon: Icons.add,
+                      label: '基础按钮',
+                      size: 56,
+                    ),
+                    _FABDemoItem(
+                      icon: Icons.menu,
+                      label: '展开菜单',
+                      size: 56,
+                      menuItems: [
+                        YicoreFloatingActionMenuItem(
+                          icon: Icons.edit,
+                          onPressed: () {
+                            Notifications.sonner(
+                              context,
+                              message: '编辑',
+                            );
+                          },
+                        ),
+                        YicoreFloatingActionMenuItem(
+                          icon: Icons.delete,
+                          onPressed: () {
+                            Notifications.sonner(
+                              context,
+                              message: '删除',
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -366,7 +496,7 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
                 runSpacing: 12,
                 alignment: WrapAlignment.center,
                 children: [
-                  CustomButton(
+                  YicoreButton(
                 text: '带标题和按钮',
                     onPressed: () => Notifications.sonner(
                       context,
@@ -381,7 +511,7 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
                       },
                     ),
                   ),
-                  CustomButton(
+                  YicoreButton(
                 text: '带操作按钮',
                     onPressed: () => Notifications.sonner(
                       context,
@@ -396,14 +526,14 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
                       },
                     ),
                   ),
-              CustomButton(
+              YicoreButton(
                 text: '仅消息',
                 onPressed: () => Notifications.sonner(
                   context,
                   message: '这是一条简单的通知消息',
                 ),
               ),
-              CustomButton(
+              YicoreButton(
                 text: '仅标题',
                 onPressed: () => Notifications.sonner(
                   context,
@@ -434,9 +564,9 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
           runSpacing: 12,
           alignment: WrapAlignment.center,
           children: [
-            CustomButton(
+                      YicoreButton(
               text: 'Alert 提示',
-              onPressed: () => CustomAlert.show(
+              onPressed: () => YicoreAlert.show(
                 context,
                 title: '提示',
                 message: '这是一个 Alert 对话框示例',
@@ -445,10 +575,10 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
                 },
               ),
             ),
-            CustomButton(
+                      YicoreButton(
               text: 'Confirm 确认',
               onPressed: () async {
-                final result = await CustomConfirm.show(
+                final result = await YicoreConfirm.show(
                   context,
                   title: '确认操作',
                   message: '确定要执行此操作吗？',
@@ -467,9 +597,9 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
                 }
               },
             ),
-            CustomButton(
+                      YicoreButton(
               text: 'Modal 模态',
-              onPressed: () => CustomModal.show(
+              onPressed: () => YicoreModal.show(
                 context,
                 title: '模态对话框',
                 child: Column(
@@ -496,7 +626,7 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
                   builder: (dialogContext) => Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      CustomButton(
+                      YicoreButton(
                         text: '取消',
                         isOutlined: true,
                         onPressed: () {
@@ -506,7 +636,7 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
                         },
                       ),
                       SizedBox(width: 12),
-                      CustomButton(
+                      YicoreButton(
                         text: '确定',
                         onPressed: () {
                           if (dialogContext.mounted) {
@@ -519,9 +649,9 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
                 ),
               ),
               ),
-              CustomButton(
+              YicoreButton(
                 text: '公告对话框',
-                onPressed: () => CustomAnnouncement.show(
+                onPressed: () => YicoreAnnouncement.show(
                   context,
                   title: '系统公告',
                   message: '本周末将进行系统维护，期间可能出现短暂不可用。给您带来不便，敬请谅解。',
@@ -560,7 +690,7 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
             subtitle: '日期选择组件演示',
           ),
           SizedBox(height: 20),
-          CustomDatePickerButton(
+          YicoreDatePickerButton(
             labelText: '选择日期',
             hintText: '请选择日期',
             selectedDate: _selectedDate,
@@ -575,10 +705,10 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
             },
           ),
           SizedBox(height: 16),
-          CustomButton(
+                      YicoreButton(
             text: '弹出日期选择器',
             onPressed: () async {
-              final DateTime? picked = await CustomDatePicker.show(
+              final DateTime? picked = await YicoreDatePicker.show(
                 context: context,
                 initialDate: _selectedDate ?? DateTime.now(),
                 onDateSelected: (date) {
@@ -634,10 +764,10 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
                 ),
               ),
               SizedBox(width: 12),
-              CustomButton(
+              YicoreButton(
                 text: '选择时间',
                 onPressed: () async {
-                  final picked = await CustomTimeRangePicker.show(
+                  final picked = await YicoreTimeRangePicker.show(
                     context: context,
                     initial: _selectedRange,
                   );
@@ -672,7 +802,7 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
           SizedBox(height: 20),
           StatefulBuilder(
             builder: (context, setDemoState) {
-              return CustomBottomNavigationBar(
+              return YicoreBottomNavigationBar(
                 currentIndex: demoIndex,
                 onTap: (index) {
                   setDemoState(() {
@@ -741,6 +871,60 @@ class _SectionTitle extends StatelessWidget {
           ],
         ],
       ),
+    );
+  }
+}
+
+// ================== 悬浮按钮演示项 ==================
+class _FABDemoItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final double size;
+  final List<YicoreFloatingActionMenuItem>? menuItems;
+
+  const _FABDemoItem({
+    required this.icon,
+    required this.label,
+    required this.size,
+    this.menuItems,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Align(
+          alignment: Alignment.center,
+          child: Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.bottomCenter,
+            children: [
+              YicoreFab(
+                icon: icon,
+                size: size,
+                draggable: false,
+                menuItems: menuItems,
+                onPressed: () {
+                  Notifications.sonner(
+                    context,
+                    message: '点击了 $label 按钮',
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: 8),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey[600],
+          ),
+        ),
+      ],
     );
   }
 }

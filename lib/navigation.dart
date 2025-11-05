@@ -12,12 +12,12 @@ class BottomNavItem {
 }
 
 // ================== 自定义底部导航栏 ==================
-class CustomBottomNavigationBar extends StatelessWidget {
+class YicoreBottomNavigationBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
   final List<BottomNavItem> items;
 
-  const CustomBottomNavigationBar({
+  const YicoreBottomNavigationBar({
     required this.currentIndex,
     required this.onTap,
     required this.items,

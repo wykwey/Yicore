@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 // ================== 自定义卡片 ==================
-class CustomCard extends StatelessWidget {
+class YicoreCard extends StatelessWidget {
   final Widget child;
   final EdgeInsets? padding;
   final VoidCallback? onTap;
 
-  const CustomCard({
+  const YicoreCard({
     required this.child,
     this.padding,
     this.onTap,
