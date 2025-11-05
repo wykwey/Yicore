@@ -50,8 +50,6 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
                   _buildButtonDemo(),
                   SizedBox(height: 50),
                   _buildTextFieldDemo(),
-                  SizedBox(height: 50),
-                  _buildFloatingActionButtonDemo(),
                 ] else if (_currentIndex == 1) ...[
                   // 进阶组件
                   _buildNotificationDemo(),
@@ -401,83 +399,6 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
     );
   }
 
-  // ================== 悬浮窗按钮组件演示 ==================
-  Widget _buildFloatingActionButtonDemo() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _SectionTitle(
-            title: '悬浮窗按钮',
-            subtitle: '自定义悬浮按钮样式',
-          ),
-          SizedBox(height: 20),
-          YicoreCard(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '悬浮按钮说明',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black,
-                  ),
-                ),
-                SizedBox(height: 12),
-                Text(
-                  '悬浮窗按钮位于页面右下角，点击可触发操作。支持自定义图标、颜色和大小。',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[700],
-                    height: 1.5,
-                  ),
-                ),
-                SizedBox(height: 16),
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  children: [
-                    _FABDemoItem(
-                      icon: Icons.add,
-                      label: '基础按钮',
-                      size: 56,
-                    ),
-                    _FABDemoItem(
-                      icon: Icons.menu,
-                      label: '展开菜单',
-                      size: 56,
-                      menuItems: [
-                        YicoreFloatingActionMenuItem(
-                          icon: Icons.edit,
-                          onPressed: () {
-                            Notifications.sonner(
-                              context,
-                              message: '编辑',
-                            );
-                          },
-                        ),
-                        YicoreFloatingActionMenuItem(
-                          icon: Icons.delete,
-                          onPressed: () {
-                            Notifications.sonner(
-                              context,
-                              message: '删除',
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   // ================== 通知组件演示 ==================
   Widget _buildNotificationDemo() {
@@ -875,56 +796,3 @@ class _SectionTitle extends StatelessWidget {
   }
 }
 
-// ================== 悬浮按钮演示项 ==================
-class _FABDemoItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final double size;
-  final List<YicoreFloatingActionMenuItem>? menuItems;
-
-  const _FABDemoItem({
-    required this.icon,
-    required this.label,
-    required this.size,
-    this.menuItems,
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Align(
-          alignment: Alignment.center,
-          child: Stack(
-            clipBehavior: Clip.none,
-            alignment: Alignment.bottomCenter,
-            children: [
-              YicoreFab(
-                icon: icon,
-                size: size,
-                draggable: false,
-                menuItems: menuItems,
-                onPressed: () {
-                  Notifications.sonner(
-                    context,
-                    message: '点击了 $label 按钮',
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-        SizedBox(height: 8),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[600],
-          ),
-        ),
-      ],
-    );
-  }
-}

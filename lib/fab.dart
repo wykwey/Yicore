@@ -81,6 +81,7 @@ class _YicoreFabState extends State<YicoreFab>
       return;
     }
     
+    if (!mounted) return;
     setState(() {
       _isExpanded = !_isExpanded;
       if (_isExpanded) {
@@ -92,7 +93,7 @@ class _YicoreFabState extends State<YicoreFab>
   }
 
   void _closeMenu() {
-    if (_isExpanded) {
+    if (_isExpanded && mounted) {
       setState(() {
         _isExpanded = false;
         _controller.reverse();
@@ -124,6 +125,7 @@ class _YicoreFabState extends State<YicoreFab>
         GestureDetector(
           onPanUpdate: widget.draggable
               ? (details) {
+                  if (!mounted) return;
                   setState(() {
                     final newX = _position.dx - details.delta.dx;
                     final newY = _position.dy - details.delta.dy;
