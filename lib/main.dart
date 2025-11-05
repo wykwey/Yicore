@@ -1,0 +1,746 @@
+import 'package:flutter/material.dart';
+import 'notifications.dart';
+import 'components.dart';
+import 'navigation.dart';
+import 'cards.dart';
+import 'settingscard.dart';
+import 'dialogs.dart';
+import 'datepicker.dart';
+import 'time_range_picker.dart';
+
+void main() {
+  runApp(MaterialApp(
+    home: ComponentDemoPage(),
+  ));
+}
+
+// ================== 主演示页面 ==================
+class ComponentDemoPage extends StatefulWidget {
+  @override
+  _ComponentDemoPageState createState() => _ComponentDemoPageState();
+}
+
+class _ComponentDemoPageState extends State<ComponentDemoPage> {
+  bool _switchValue = false;
+  double _sliderValue = 50.0;
+  int _currentIndex = 0;
+  DateTime? _selectedDate;
+  TimeRange? _selectedRange;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color(0xFFF7F7F7),
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SizedBox(height: 20),
+            if (_currentIndex == 0) ...[
+              // 基础组件
+              _buildSettingsBlockDemo(),
+              SizedBox(height: 50),
+              _buildSliderDemo(),
+              SizedBox(height: 50),
+              _buildCardDemo(),
+              SizedBox(height: 50),
+              _buildButtonDemo(),
+              SizedBox(height: 50),
+              _buildTextFieldDemo(),
+            ] else if (_currentIndex == 1) ...[
+              // 进阶组件
+              _buildNotificationDemo(),
+              SizedBox(height: 50),
+              _buildDialogDemo(),
+              SizedBox(height: 50),
+              _buildDatePickerDemo(),
+            SizedBox(height: 50),
+            _buildTimeRangePickerDemo(),
+            ] else if (_currentIndex == 2) ...[
+              // 高级组件
+              _buildNavigationDemo(),
+            ],
+            SizedBox(height: 50),
+          ],
+        ),
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: CustomBottomNavigationBar(
+            currentIndex: _currentIndex,
+            onTap: (index) => setState(() => _currentIndex = index),
+            items: [
+              BottomNavItem(
+                icon: Icons.widgets,
+                label: '基础组件',
+              ),
+              BottomNavItem(
+                icon: Icons.extension,
+                label: '进阶组件',
+              ),
+              BottomNavItem(
+                icon: Icons.workspace_premium,
+                label: '高级组件',
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ================== 设置区块演示 ==================
+  Widget _buildSettingsBlockDemo() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        children: [
+          SettingsBlock(
+            title: '通知设置',
+            children: [
+              SettingsItem.switch_(
+                title: '推送通知',
+                description: '接收应用推送通知',
+                value: _switchValue,
+                onChanged: (val) => setState(() => _switchValue = val),
+              ),
+              SettingsItem.switch_(
+                title: '声音提醒',
+                description: '开启声音提醒',
+                value: _switchValue,
+                onChanged: (val) => setState(() => _switchValue = val),
+              ),
+              SettingsItem.slider(
+                title: '音量大小',
+                description: '调整通知音量',
+                value: _sliderValue,
+                min: 0,
+                max: 100,
+                onChanged: (val) => setState(() => _sliderValue = val),
+              ),
+            ],
+        ),
+        SizedBox(height: 20),
+          SettingsBlock(
+            title: '账户设置',
+            children: [
+              SettingsItem.value(
+                title: '用户名',
+                description: '当前登录用户名',
+                value: 'user123',
+                onTap: () {
+                  Notifications.sonner(
+                    context,
+                    title: '用户名',
+                    message: '点击了用户名设置项',
+                  );
+                },
+              ),
+              SettingsItem.value(
+                title: '语言',
+                value: '简体中文',
+                onTap: () {
+                  Notifications.sonner(
+                    context,
+                    title: '语言设置',
+                    message: '点击了语言设置项',
+                  );
+                },
+              ),
+              SettingsItem.text(
+                title: '关于我们',
+                description: '查看应用信息和版本',
+                onTap: () {
+                  CustomAlert.show(
+                    context,
+                    title: '关于我们',
+                    message: 'YIClass v2.1.0\n\n一个课表管理工具，支持多种课程表格式导入，支持多种平台。',
+                  );
+                },
+                showArrow: true,
+              ),
+              SettingsItem.text(
+                title: '退出登录',
+                description: '退出当前账户',
+                onTap: () {
+                  CustomConfirm.show(
+                    context,
+                    title: '退出登录',
+                    message: '确定要退出登录吗？',
+                    onConfirm: () {
+                      Notifications.sonner(
+                        context,
+                        title: '已退出',
+                        message: '您已成功退出登录',
+                      );
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ================== 滑块组件演示 ==================
+  Widget _buildSliderDemo() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionTitle(
+            title: '滑块组件',
+            subtitle: '自定义滑块样式',
+          ),
+          SizedBox(height: 20),
+          CustomSlider(
+            value: _sliderValue,
+            min: 0,
+            max: 100,
+            onChanged: (val) => setState(() => _sliderValue = val),
+          ),
+          SizedBox(height: 12),
+          Center(
+            child: Text(
+              '当前值: ${_sliderValue.toStringAsFixed(0)}',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[700],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ================== 卡片组件演示 ==================
+  Widget _buildCardDemo() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionTitle(
+            title: '卡片组件',
+            subtitle: '自定义卡片样式',
+          ),
+          SizedBox(height: 20),
+          CustomCard(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '卡片标题',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                  ),
+                ),
+                SizedBox(height: 12),
+                Text(
+                  '这是一个卡片组件的示例内容。卡片可以包含任意内容，支持标题、描述、图片等多种元素。',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[700],
+                    height: 1.5,
+                  ),
+                ),
+                SizedBox(height: 16),
+                Row(
+                  children: [
+                    CustomSwitch(
+                      value: _switchValue,
+                      onChanged: (val) => setState(() => _switchValue = val),
+                    ),
+                    SizedBox(width: 12),
+                    Text(
+                      '启用选项',
+                      style: TextStyle(fontSize: 14),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ================== 按钮组件演示 ==================
+  Widget _buildButtonDemo() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+          _SectionTitle(
+            title: '按钮组件',
+            subtitle: '自定义按钮样式示例',
+          ),
+          SizedBox(height: 20),
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            alignment: WrapAlignment.start,
+            children: [
+              CustomButton(
+                text: '主要按钮',
+                onPressed: () {},
+              ),
+              CustomButton(
+                text: '次要按钮',
+                isSecondary: true,
+                onPressed: () {},
+              ),
+              CustomButton(
+                text: '轮廓按钮',
+                isOutlined: true,
+                onPressed: () {},
+              ),
+              CustomButton(
+                text: '加载中',
+                isLoading: true,
+                onPressed: () {},
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ================== 输入框组件演示 ==================
+  Widget _buildTextFieldDemo() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionTitle(
+            title: '输入框组件',
+            subtitle: '自定义输入框样式',
+          ),
+          SizedBox(height: 20),
+          CustomTextField(
+            labelText: '用户名',
+            hintText: '请输入用户名',
+          ),
+          SizedBox(height: 16),
+          CustomTextField(
+            labelText: '禁用状态',
+            hintText: '此输入框已禁用',
+            enabled: false,
+          ),
+          SizedBox(height: 16),
+          CustomTextField(
+            labelText: '错误状态',
+            hintText: '请输入内容',
+            errorText: '此字段为必填项',
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ================== 通知组件演示 ==================
+  Widget _buildNotificationDemo() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+          _SectionTitle(
+            title: '通知组件',
+            subtitle: 'Sonner 通知系统演示',
+          ),
+          SizedBox(height: 20),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                alignment: WrapAlignment.center,
+                children: [
+                  CustomButton(
+                text: '带标题和按钮',
+                    onPressed: () => Notifications.sonner(
+                      context,
+                  title: '操作成功',
+                  message: '您的操作已成功完成',
+                      actionText: '撤销',
+                      onAction: () {
+                        Notifications.sonner(
+                          context,
+                      message: '操作已撤销',
+                        );
+                      },
+                    ),
+                  ),
+                  CustomButton(
+                text: '带操作按钮',
+                    onPressed: () => Notifications.sonner(
+                      context,
+                  title: '发生错误',
+                      message: '操作失败，请重试',
+                      actionText: '重试',
+                      onAction: () {
+                        Notifications.sonner(
+                          context,
+                      message: '正在重试...',
+                        );
+                      },
+                    ),
+                  ),
+              CustomButton(
+                text: '仅消息',
+                onPressed: () => Notifications.sonner(
+                  context,
+                  message: '这是一条简单的通知消息',
+                ),
+              ),
+              CustomButton(
+                text: '仅标题',
+                onPressed: () => Notifications.sonner(
+                  context,
+                  title: '通知标题',
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ================== 对话框组件演示 ==================
+  Widget _buildDialogDemo() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionTitle(
+            title: '对话框组件',
+            subtitle: 'Alert、Confirm、Modal',
+          ),
+          SizedBox(height: 20),
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          alignment: WrapAlignment.center,
+          children: [
+            CustomButton(
+              text: 'Alert 提示',
+              onPressed: () => CustomAlert.show(
+                context,
+                title: '提示',
+                message: '这是一个 Alert 对话框示例',
+                onConfirm: () {
+                  print('Alert 确认');
+                },
+              ),
+            ),
+            CustomButton(
+              text: 'Confirm 确认',
+              onPressed: () async {
+                final result = await CustomConfirm.show(
+                  context,
+                  title: '确认操作',
+                  message: '确定要执行此操作吗？',
+                  onConfirm: () {
+                    print('Confirm 确认');
+                  },
+                  onCancel: () {
+                    print('Confirm 取消');
+                  },
+                );
+                if (mounted && result) {
+                  Notifications.sonner(
+                    context,
+                    message: '已确认操作',
+                  );
+                }
+              },
+            ),
+            CustomButton(
+              text: 'Modal 模态',
+              onPressed: () => CustomModal.show(
+                context,
+                title: '模态对话框',
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      '这是一个模态对话框示例',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[700],
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      '可以在这里放置任何内容，如表单、列表、图片等。',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+                footer: Builder(
+                  builder: (dialogContext) => Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      CustomButton(
+                        text: '取消',
+                        isOutlined: true,
+                        onPressed: () {
+                          if (dialogContext.mounted) {
+                            Navigator.of(dialogContext, rootNavigator: true).pop();
+                          }
+                        },
+                      ),
+                      SizedBox(width: 12),
+                      CustomButton(
+                        text: '确定',
+                        onPressed: () {
+                          if (dialogContext.mounted) {
+                            Navigator.of(dialogContext, rootNavigator: true).pop();
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              ),
+              CustomButton(
+                text: '公告对话框',
+                onPressed: () => CustomAnnouncement.show(
+                  context,
+                  title: '系统公告',
+                  message: '本周末将进行系统维护，期间可能出现短暂不可用。给您带来不便，敬请谅解。',
+                  primaryText: '我知道了',
+                  secondaryText: '稍后提醒',
+                  onPrimary: () {
+                    Notifications.sonner(
+                      context,
+                      message: '已确认公告',
+                    );
+                  },
+                  onSecondary: () {
+                    Notifications.sonner(
+                      context,
+                      message: '将稍后提醒',
+                    );
+                  },
+                ),
+              ),
+            ],
+            ),
+          ],
+        ),
+    );
+  }
+
+  // ================== 日期选择器演示 ==================
+  Widget _buildDatePickerDemo() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionTitle(
+            title: '日期选择器',
+            subtitle: '日期选择组件演示',
+          ),
+          SizedBox(height: 20),
+          CustomDatePickerButton(
+            labelText: '选择日期',
+            hintText: '请选择日期',
+            selectedDate: _selectedDate,
+            onDateSelected: (date) {
+              setState(() {
+                _selectedDate = date;
+              });
+              Notifications.sonner(
+                context,
+                message: '已选择日期：${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}',
+              );
+            },
+          ),
+          SizedBox(height: 16),
+          CustomButton(
+            text: '弹出日期选择器',
+            onPressed: () async {
+              final DateTime? picked = await CustomDatePicker.show(
+                context: context,
+                initialDate: _selectedDate ?? DateTime.now(),
+                onDateSelected: (date) {
+                  setState(() {
+                    _selectedDate = date;
+                  });
+                },
+              );
+              if (picked != null && mounted) {
+                Notifications.sonner(
+                  context,
+                  message: '已选择日期',
+                );
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ================== 时间范围选择器演示 ==================
+  Widget _buildTimeRangePickerDemo() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionTitle(
+            title: '时间范围选择器',
+            subtitle: '底部弹窗，格式 xx:xx-xx:xx',
+          ),
+          SizedBox(height: 20),
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.grey[300]!, width: 1),
+                  ),
+                  child: Text(
+                    _selectedRange != null
+                        ? _selectedRange!.format()
+                        : '未选择',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: _selectedRange != null ? Colors.black : Colors.grey[400],
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: 12),
+              CustomButton(
+                text: '选择时间',
+                onPressed: () async {
+                  final picked = await CustomTimeRangePicker.show(
+                    context: context,
+                    initial: _selectedRange,
+                  );
+                  if (picked != null && mounted) {
+                    setState(() => _selectedRange = picked);
+                    Notifications.sonner(
+                      context,
+                      message: '已选择 ${picked.format()}',
+                    );
+                  }
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ================== 导航组件演示 ==================
+  Widget _buildNavigationDemo() {
+    int demoIndex = 0;
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionTitle(
+            title: '底部导航栏',
+            subtitle: '自定义底部导航样式演示',
+          ),
+          SizedBox(height: 20),
+          StatefulBuilder(
+            builder: (context, setDemoState) {
+              return CustomBottomNavigationBar(
+                currentIndex: demoIndex,
+                onTap: (index) {
+                  setDemoState(() {
+                    demoIndex = index;
+                  });
+                },
+                items: [
+                  BottomNavItem(
+                    icon: Icons.home,
+                    label: '首页',
+                  ),
+                  BottomNavItem(
+                    icon: Icons.calendar_today,
+                    label: '课表',
+                  ),
+                  BottomNavItem(
+                    icon: Icons.settings,
+                    label: '设置',
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ================== 节标题组件 ==================
+class _SectionTitle extends StatelessWidget {
+  final String title;
+  final String? subtitle;
+
+  const _SectionTitle({
+    required this.title,
+    this.subtitle,
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(20, 24, 20, 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.black,
+              letterSpacing: 0.3,
+            ),
+          ),
+          if (subtitle != null) ...[
+            SizedBox(height: 4),
+            Text(
+              subtitle!,
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.grey[600],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
