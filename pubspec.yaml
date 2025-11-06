@@ -1,7 +1,7 @@
 name: Yicore
 description: Yicore是为 YiClass 课表项目打造的轻量级 Flutter 组件库
 
-version: 1.0.2
+version: 1.0.3
 
 environment:
   sdk: ">=3.5.0 <4.0.0"

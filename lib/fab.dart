@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 // ================== 悬浮窗菜单项 ==================
-class YicoreFloatingActionMenuItem {
+class YicoreFabItem {
   final IconData icon;
   final String? label;
   final VoidCallback? onPressed;
   final Color? backgroundColor;
 
-  const YicoreFloatingActionMenuItem({
+  const YicoreFabItem({
     required this.icon,
     this.label,
     this.onPressed,
@@ -20,9 +20,8 @@ class YicoreFab extends StatefulWidget {
   final IconData icon;
   final VoidCallback? onPressed;
   final String? tooltip;
-  final List<YicoreFloatingActionMenuItem>? menuItems;
+  final List<YicoreFabItem>? menuItems;
   final double size;
-  final bool draggable;
 
   const YicoreFab({
     required this.icon,
@@ -30,7 +29,6 @@ class YicoreFab extends StatefulWidget {
     this.tooltip,
     this.menuItems,
     this.size = 56.0,
-    this.draggable = true,
     Key? key,
   }) : super(key: key);
 
@@ -40,147 +38,219 @@ class YicoreFab extends StatefulWidget {
 
 class _YicoreFabState extends State<YicoreFab>
     with SingleTickerProviderStateMixin {
-  bool _isExpanded = false;
-  late AnimationController _controller;
+  late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
-  late Animation<double> _rotateAnimation;
-  Offset _position = const Offset(24, 24); // 初始位置（右下角）
+  late Animation<double> _rotationAnimation;
+  
+  Offset _position = const Offset(24, 24);
+  bool _isExpanded = false;
+  bool _isDragging = false;
+  Offset _dragStartPosition = Offset.zero;
+  
+  static const double _dragThreshold = 5.0; // 拖动阈值（像素）
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
+    _initAnimations();
+  }
+
+  void _initAnimations() {
+    _animationController = AnimationController(
       duration: const Duration(milliseconds: 200),
       vsync: this,
     );
-    _scaleAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInOut,
-    ));
-    _rotateAnimation = Tween<double>(
-      begin: 0.0,
-      end: 0.125, // 45度
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInOut,
-    ));
+    
+    _scaleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+    );
+    
+    _rotationAnimation = Tween<double>(begin: 0.0, end: 0.125).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
   void _toggleMenu() {
-    if (widget.menuItems == null || widget.menuItems!.isEmpty) {
+    if (_hasMenuItems) {
+      setState(() {
+        _isExpanded = !_isExpanded;
+        if (_isExpanded) {
+          _animationController.forward();
+          _adjustPosition();
+        } else {
+          _animationController.reverse();
+        }
+      });
+    } else {
       widget.onPressed?.call();
-      return;
     }
-    
-    if (!mounted) return;
-    setState(() {
-      _isExpanded = !_isExpanded;
-      if (_isExpanded) {
-        _controller.forward();
-      } else {
-        _controller.reverse();
-      }
-    });
   }
 
   void _closeMenu() {
     if (_isExpanded && mounted) {
       setState(() {
         _isExpanded = false;
-        _controller.reverse();
+        _animationController.reverse();
       });
     }
   }
 
+  void _adjustPosition() {
+    final screenSize = MediaQuery.of(context).size;
+    final expandedHeight = _getExpandedHeight();
+    
+    setState(() {
+      _position = Offset(
+        _position.dx.clamp(0.0, screenSize.width - widget.size),
+        _position.dy.clamp(0.0, screenSize.height - expandedHeight),
+      );
+    });
+  }
+
+  void _onPanStart(DragStartDetails details) {
+    _dragStartPosition = details.globalPosition;
+    // 不立即设置 _isDragging，等到真正移动时再判断
+  }
+
+  void _onPanUpdate(DragUpdateDetails details) {
+    if (!mounted) return;
+    
+    // 计算从起始位置的总移动距离
+    final dragDistance = (details.globalPosition - _dragStartPosition).distance;
+    
+    // 只有移动距离超过阈值才认为是拖动
+    if (!_isDragging && dragDistance > _dragThreshold) {
+      setState(() {
+        _isDragging = true;
+      });
+      if (_isExpanded) {
+        _closeMenu();
+      }
+    }
+    
+    // 只有确认是拖动后才更新位置
+    if (_isDragging) {
+      final screenSize = MediaQuery.of(context).size;
+      final expandedHeight = _getExpandedHeight();
+      setState(() {
+        _position = Offset(
+          (_position.dx - details.delta.dx).clamp(0.0, screenSize.width - widget.size),
+          (_position.dy - details.delta.dy).clamp(0.0, screenSize.height - expandedHeight),
+        );
+      });
+    }
+  }
+
+  void _onPanEnd(DragEndDetails details) {
+    // 延迟重置，确保点击事件能正确判断
+    Future.delayed(const Duration(milliseconds: 100), () {
+      if (mounted) {
+        setState(() {
+          _isDragging = false;
+        });
+      }
+    });
+  }
+
+  bool get _hasMenuItems => 
+      widget.menuItems != null && widget.menuItems!.isNotEmpty;
+
+  double _getExpandedHeight() {
+    if (!_hasMenuItems) return widget.size;
+    return widget.size * (widget.menuItems!.length + 1) + 
+           16.0 * widget.menuItems!.length;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-    final expandedHeight = widget.menuItems != null && widget.menuItems!.isNotEmpty
-        ? widget.size * (widget.menuItems!.length + 1) + 16 * widget.menuItems!.length
-        : widget.size;
-
-    Widget content = Column(
-      mainAxisSize: MainAxisSize.min,
+    return Stack(
       children: [
-        // 菜单项（从下往上排列，从最后一个开始）
-        if (_isExpanded && widget.menuItems != null && widget.menuItems!.isNotEmpty)
-          ...widget.menuItems!.asMap().entries.map((entry) {
-            final index = entry.key;
-            final item = entry.value;
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: _buildMenuItem(item, index),
-            );
-          }).toList(),
-        // 主按钮
-        GestureDetector(
-          onPanUpdate: widget.draggable
-              ? (details) {
-                  if (!mounted) return;
-                  setState(() {
-                    final newX = _position.dx - details.delta.dx;
-                    final newY = _position.dy - details.delta.dy;
-                    
-                    // 限制在屏幕边界内
-                    final minX = 0.0;
-                    final maxX = screenSize.width - widget.size;
-                    final minY = 0.0;
-                    final maxY = screenSize.height - expandedHeight;
-                    
-                    _position = Offset(
-                      newX.clamp(minX, maxX),
-                      newY.clamp(minY, maxY),
-                    );
-                  });
-                }
-              : null,
-          child: _buildMainButton(),
+        Positioned(
+          right: _position.dx,
+          bottom: _position.dy,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (_isExpanded && _hasMenuItems)
+                ..._buildMenuItems(),
+              _buildMainButton(),
+            ],
+          ),
         ),
       ],
     );
+  }
 
-    // 如果可拖动，使用 Stack + Positioned 进行定位
-    if (widget.draggable) {
-      return Stack(
-        children: [
-          Positioned(
-            right: _position.dx,
-            bottom: _position.dy,
-            child: content,
+  List<Widget> _buildMenuItems() {
+    return widget.menuItems!.map((item) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 16),
+        child: ScaleTransition(
+          scale: _scaleAnimation,
+          child: _MenuItemButton(
+            size: widget.size,
+            icon: item.icon,
+            backgroundColor: item.backgroundColor ?? Colors.white,
+            onTap: () {
+              item.onPressed?.call();
+              _closeMenu();
+            },
           ),
-        ],
+        ),
       );
-    }
-
-    // 如果不可拖动，直接返回内容（适合在常规布局中使用）
-    return content;
+    }).toList();
   }
 
   Widget _buildMainButton() {
+    return GestureDetector(
+      onPanStart: _onPanStart,
+      onPanUpdate: _onPanUpdate,
+      onPanEnd: _onPanEnd,
+      onPanCancel: () {
+        // 延迟重置，确保点击事件能正确判断
+        Future.delayed(const Duration(milliseconds: 100), () {
+          if (mounted) {
+            setState(() {
+              _isDragging = false;
+            });
+          }
+        });
+      },
+      child: _buildCircleButton(
+        icon: _isExpanded ? Icons.close : widget.icon,
+        backgroundColor: Colors.white,
+        onTap: _isDragging ? null : _toggleMenu,
+        rotation: _rotationAnimation,
+        tooltip: !_isExpanded ? widget.tooltip : null,
+      ),
+    );
+  }
+
+  Widget _buildCircleButton({
+    required IconData icon,
+    required Color backgroundColor,
+    VoidCallback? onTap,
+    Animation<double>? rotation,
+    String? tooltip,
+  }) {
     Widget button = Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: _toggleMenu,
+        onTap: onTap,
         borderRadius: BorderRadius.circular(widget.size / 2),
         child: Container(
           width: widget.size,
           height: widget.size,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: backgroundColor,
             shape: BoxShape.circle,
-            border: Border.all(
-              color: Colors.grey[300]!,
-              width: 1,
-            ),
+            border: Border.all(color: Colors.grey[300]!, width: 1),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.1),
@@ -189,49 +259,103 @@ class _YicoreFabState extends State<YicoreFab>
               ),
             ],
           ),
-          child: RotationTransition(
-            turns: _rotateAnimation,
-            child: Icon(
-              _isExpanded ? Icons.close : widget.icon,
-              color: Colors.black.withValues(alpha: 0.85),
-              size: widget.size * 0.5,
-            ),
-          ),
+          child: rotation != null
+              ? RotationTransition(
+                  turns: rotation,
+                  child: Icon(
+                    icon,
+                    color: Colors.black.withValues(alpha: 0.85),
+                    size: widget.size * 0.5,
+                  ),
+                )
+              : Icon(
+                  icon,
+                  color: Colors.black.withValues(alpha: 0.85),
+                  size: widget.size * 0.5,
+                ),
         ),
       ),
     );
 
-    if (widget.tooltip != null && widget.tooltip!.isNotEmpty && !_isExpanded) {
-      button = Tooltip(
-        message: widget.tooltip!,
-        child: button,
-      );
+    if (tooltip != null && tooltip.isNotEmpty) {
+      return Tooltip(message: tooltip, child: button);
     }
-
+    
     return button;
   }
+}
 
-  Widget _buildMenuItem(YicoreFloatingActionMenuItem item, int index) {
-    return ScaleTransition(
-      scale: _scaleAnimation,
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {
-            item.onPressed?.call();
-            _closeMenu();
-          },
-          borderRadius: BorderRadius.circular(widget.size / 2),
+// ================== 菜单项按钮（带点击反馈） ==================
+class _MenuItemButton extends StatefulWidget {
+  final double size;
+  final IconData icon;
+  final Color backgroundColor;
+  final VoidCallback? onTap;
+
+  const _MenuItemButton({
+    required this.size,
+    required this.icon,
+    required this.backgroundColor,
+    this.onTap,
+  });
+
+  @override
+  State<_MenuItemButton> createState() => _MenuItemButtonState();
+}
+
+class _MenuItemButtonState extends State<_MenuItemButton>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 100),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.9).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _handleTapDown(TapDownDetails details) {
+    _controller.forward();
+  }
+
+  void _handleTapUp(TapUpDetails details) {
+    _controller.reverse();
+    widget.onTap?.call();
+  }
+
+  void _handleTapCancel() {
+    _controller.reverse();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: _handleTapDown,
+      onTapUp: _handleTapUp,
+      onTapCancel: _handleTapCancel,
+      child: ScaleTransition(
+        scale: _scaleAnimation,
+        child: Material(
+          color: Colors.transparent,
           child: Container(
             width: widget.size,
             height: widget.size,
             decoration: BoxDecoration(
-              color: item.backgroundColor ?? Colors.white,
+              color: widget.backgroundColor,
               shape: BoxShape.circle,
-              border: Border.all(
-                color: Colors.grey[300]!,
-                width: 1,
-              ),
+              border: Border.all(color: Colors.grey[300]!, width: 1),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.1),
@@ -241,7 +365,7 @@ class _YicoreFabState extends State<YicoreFab>
               ],
             ),
             child: Icon(
-              item.icon,
+              widget.icon,
               color: Colors.black.withValues(alpha: 0.85),
               size: widget.size * 0.5,
             ),
@@ -251,4 +375,3 @@ class _YicoreFabState extends State<YicoreFab>
     );
   }
 }
-

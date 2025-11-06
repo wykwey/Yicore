@@ -8,6 +8,8 @@ import 'dialogs.dart';
 import 'datepicker.dart';
 import 'timepicker.dart';
 import 'fab.dart';
+import 'dropdown.dart';
+import 'schedule_manager.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -27,6 +29,13 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
   int _currentIndex = 0;
   DateTime? _selectedDate;
   TimeRange? _selectedRange;
+  String? _selectedLanguage;
+  String? _selectedCountry;
+  List<Schedule> _schedules = [
+    Schedule(id: '1', name: '课表1'),
+    Schedule(id: '2', name: '课表2'),
+  ];
+  String? _currentScheduleId = '1';
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +59,8 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
                   _buildButtonDemo(),
                   SizedBox(height: 50),
                   _buildTextFieldDemo(),
+                  SizedBox(height: 50),
+                  _buildDropdownDemo(),
                 ] else if (_currentIndex == 1) ...[
                   // 进阶组件
                   _buildNotificationDemo(),
@@ -70,10 +81,8 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
           // 悬浮窗按钮演示
           YicoreFab(
             icon: Icons.add,
-            tooltip: '点击展开菜单，长按拖动',
-            draggable: true,
             menuItems: [
-              YicoreFloatingActionMenuItem(
+              YicoreFabItem(
                 icon: Icons.edit,
                 label: '编辑',
                 onPressed: () {
@@ -83,10 +92,10 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
                   );
                 },
               ),
-              YicoreFloatingActionMenuItem(
+              YicoreFabItem(
                 icon: Icons.favorite,
                 label: '收藏',
-                backgroundColor: Colors.red.withValues(alpha: 0.1),
+
                 onPressed: () {
                   Notifications.sonner(
                     context,
@@ -94,7 +103,7 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
                   );
                 },
               ),
-              YicoreFloatingActionMenuItem(
+              YicoreFabItem(
                 icon: Icons.share,
                 label: '分享',
                 onPressed: () {
@@ -399,6 +408,131 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
     );
   }
 
+  // ================== 下拉组件演示 ==================
+  Widget _buildDropdownDemo() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionTitle(
+            title: '下拉组件',
+            subtitle: '自定义下拉选择样式',
+          ),
+          SizedBox(height: 20),
+          YicoreDropdown<String>(
+            labelText: '选择语言',
+            hintText: '请选择语言',
+            value: _selectedLanguage,
+            items: [
+              YicoreDropdownItem(
+                value: 'zh',
+                label: '简体中文',
+                icon: Icons.language,
+              ),
+              YicoreDropdownItem(
+                value: 'en',
+                label: 'English',
+                icon: Icons.language,
+              ),
+              YicoreDropdownItem(
+                value: 'ja',
+                label: '日本語',
+                icon: Icons.language,
+              ),
+              YicoreDropdownItem(
+                value: 'ko',
+                label: '한국어',
+                icon: Icons.language,
+              ),
+            ],
+            onChanged: (value) {
+              setState(() {
+                _selectedLanguage = value;
+              });
+              Notifications.sonner(
+                context,
+                message: '已选择: ${value == 'zh' ? '简体中文' : value == 'en' ? 'English' : value == 'ja' ? '日本語' : '한국어'}',
+              );
+            },
+          ),
+          SizedBox(height: 16),
+          YicoreDropdown<String>(
+            labelText: '选择国家',
+            hintText: '请选择国家',
+            value: _selectedCountry,
+            items: [
+              YicoreDropdownItem(
+                value: 'cn',
+                label: '中国',
+                icon: Icons.flag,
+              ),
+              YicoreDropdownItem(
+                value: 'us',
+                label: '美国',
+                icon: Icons.flag,
+              ),
+              YicoreDropdownItem(
+                value: 'jp',
+                label: '日本',
+                icon: Icons.flag,
+              ),
+              YicoreDropdownItem(
+                value: 'kr',
+                label: '韩国',
+                icon: Icons.flag,
+              ),
+            ],
+            onChanged: (value) {
+              setState(() {
+                _selectedCountry = value;
+              });
+              Notifications.sonner(
+                context,
+                message: '已选择国家',
+              );
+            },
+          ),
+          SizedBox(height: 16),
+          YicoreDropdown<String>(
+            labelText: '禁用状态',
+            hintText: '此下拉框已禁用',
+            value: 'zh',
+            enabled: false,
+            items: [
+              YicoreDropdownItem(
+                value: 'zh',
+                label: '简体中文',
+              ),
+              YicoreDropdownItem(
+                value: 'en',
+                label: 'English',
+              ),
+            ],
+            onChanged: (value) {},
+          ),
+          SizedBox(height: 16),
+          YicoreDropdown<String>(
+            labelText: '错误状态',
+            hintText: '请选择选项',
+            errorText: '此字段为必填项',
+            items: [
+              YicoreDropdownItem(
+                value: 'option1',
+                label: '选项1',
+              ),
+              YicoreDropdownItem(
+                value: 'option2',
+                label: '选项2',
+              ),
+            ],
+            onChanged: (value) {},
+          ),
+        ],
+      ),
+    );
+  }
+
 
   // ================== 通知组件演示 ==================
   Widget _buildNotificationDemo() {
@@ -477,7 +611,7 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
         children: [
           _SectionTitle(
             title: '对话框组件',
-            subtitle: 'Alert、Confirm、Modal',
+            subtitle: 'Alert、Confirm、Modal、课表管理',
           ),
           SizedBox(height: 20),
         Wrap(
@@ -485,6 +619,21 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
           runSpacing: 12,
           alignment: WrapAlignment.center,
           children: [
+                      YicoreButton(
+              text: '课表管理',
+              onPressed: () {
+                YicoreScheduleManager.show(
+                  context,
+                  schedules: _schedules,
+                  currentScheduleId: _currentScheduleId,
+                  onSchedulesChanged: (updatedSchedules) {
+                    setState(() {
+                      _schedules = updatedSchedules;
+                    });
+                  },
+                );
+              },
+            ),
                       YicoreButton(
               text: 'Alert 提示',
               onPressed: () => YicoreAlert.show(
@@ -611,40 +760,55 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
             subtitle: '日期选择组件演示',
           ),
           SizedBox(height: 20),
-          YicoreDatePickerButton(
-            labelText: '选择日期',
-            hintText: '请选择日期',
-            selectedDate: _selectedDate,
-            onDateSelected: (date) {
-              setState(() {
-                _selectedDate = date;
-              });
-              Notifications.sonner(
-                context,
-                message: '已选择日期：${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}',
-              );
-            },
-          ),
-          SizedBox(height: 16),
-                      YicoreButton(
-            text: '弹出日期选择器',
-            onPressed: () async {
-              final DateTime? picked = await YicoreDatePicker.show(
-                context: context,
-                initialDate: _selectedDate ?? DateTime.now(),
-                onDateSelected: (date) {
-                  setState(() {
-                    _selectedDate = date;
-                  });
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.grey[300]!, width: 1),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          _selectedDate != null
+                              ? '${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}'
+                              : '请选择日期',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: _selectedDate != null ? Colors.black : Colors.grey[400],
+                          ),
+                        ),
+                      ),
+                      Icon(Icons.calendar_today, size: 20, color: Colors.grey[600]),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(width: 12),
+              YicoreButton(
+                text: '选择',
+                onPressed: () async {
+                  final DateTime? picked = await YicoreDatePicker.show(
+                    context: context,
+                    initialDate: _selectedDate ?? DateTime.now(),
+                  );
+                  if (picked != null && mounted) {
+                    setState(() {
+                      _selectedDate = picked;
+                    });
+                    Notifications.sonner(
+                      context,
+                      message: '已选择日期：${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}',
+                    );
+                  }
                 },
-              );
-              if (picked != null && mounted) {
-                Notifications.sonner(
-                  context,
-                  message: '已选择日期',
-                );
-              }
-            },
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              ),
+            ],
           ),
         ],
       ),
