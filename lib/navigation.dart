@@ -29,10 +29,11 @@ class YicoreBottomNavigationBar extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey[300]!, width: 1),
+        border: Border(
+          top: BorderSide(color: Colors.grey[200]!, width: 1),
+        ),
       ),
-      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: items.asMap().entries.map((entry) {
@@ -53,8 +54,8 @@ class YicoreBottomNavigationBar extends StatelessWidget {
   }
 }
 
-// ================== 导航项组件（带动画） ==================
-class _NavItem extends StatefulWidget {
+// ================== 导航项组件 ==================
+class _NavItem extends StatelessWidget {
   final BottomNavItem item;
   final bool isSelected;
   final VoidCallback onTap;
@@ -63,113 +64,44 @@ class _NavItem extends StatefulWidget {
     required this.item,
     required this.isSelected,
     required this.onTap,
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  _NavItemState createState() => _NavItemState();
-}
-
-class _NavItemState extends State<_NavItem>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: Duration(milliseconds: 200),
-      vsync: this,
-    );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.9).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  void _handleTap() {
-    _controller.forward().then((_) {
-      _controller.reverse();
-    });
-    widget.onTap();
-  }
+  });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: _handleTap,
+      onTap: onTap,
       behavior: HitTestBehavior.opaque,
-      child: AnimatedBuilder(
-        animation: _scaleAnimation,
-        builder: (context, child) {
-          return Transform.scale(
-            scale: _scaleAnimation.value,
-            child: child,
-          );
-        },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 6),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            TweenAnimationBuilder<double>(
-              duration: Duration(milliseconds: 300),
-              tween: Tween(begin: 0.0, end: widget.isSelected ? 1.0 : 0.0),
-              curve: Curves.easeInOut,
-              builder: (context, value, child) {
-                return Container(
-                  padding: EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: Color.lerp(
-                      Colors.transparent,
-                      Colors.black,
-                      value,
-                    ),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: TweenAnimationBuilder<double>(
-                    duration: Duration(milliseconds: 300),
-                    tween: Tween(begin: 0.0, end: widget.isSelected ? 1.0 : 0.0),
-                    curve: Curves.easeInOut,
-                    builder: (context, scaleValue, child) {
-                      return Transform.scale(
-                        scale: 0.8 + (scaleValue * 0.2),
-                        child: Icon(
-                          widget.item.icon,
-                          size: 20,
-                          color: Color.lerp(
-                            Colors.grey[600],
-                            Colors.white,
-                            value,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                );
-              },
+            // 图标容器
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              padding: const EdgeInsets.all(5),
+              decoration: BoxDecoration(
+                color: isSelected ? Colors.black : Colors.transparent,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                item.icon,
+                size: 19,
+                color: isSelected ? Colors.white : Colors.grey[600],
+              ),
             ),
-            SizedBox(height: 3),
-            TweenAnimationBuilder<double>(
-              duration: Duration(milliseconds: 300),
-              tween: Tween(begin: 0.0, end: widget.isSelected ? 1.0 : 0.0),
-              curve: Curves.easeInOut,
-              builder: (context, value, child) {
-                return Text(
-                  widget.item.label,
-                  style: TextStyle(
-                    fontSize: 13 + (value * 1.0),
-                    fontWeight: widget.isSelected
-                        ? FontWeight.w600
-                        : FontWeight.normal,
-                  ),
-                );
-              },
+            const SizedBox(height: 3),
+            // 标签文字
+            AnimatedDefaultTextStyle(
+              duration: const Duration(milliseconds: 200),
+              style: TextStyle(
+                fontSize: isSelected ? 13 : 12,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                color: Colors.black,
+              ),
+              child: Text(item.label),
             ),
           ],
         ),

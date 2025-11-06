@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'components.dart';
+import 'segmented_control.dart';
 
 // ================== 设置项块 ==================
 class SettingsItem extends StatelessWidget {
@@ -11,6 +12,7 @@ class SettingsItem extends StatelessWidget {
   final bool showArrow;
   final String? value;
   final bool isLastInBlock;
+  final bool enabled;
 
   const SettingsItem({
     required this.title,
@@ -21,6 +23,7 @@ class SettingsItem extends StatelessWidget {
     this.showArrow = false,
     this.value,
     this.isLastInBlock = false,
+    this.enabled = true,
     Key? key,
   }) : super(key: key);
 
@@ -31,14 +34,16 @@ class SettingsItem extends StatelessWidget {
     required bool value,
     required ValueChanged<bool> onChanged,
     bool inBlock = false,
+    bool enabled = true,
   }) {
     return SettingsItem(
       title: title,
       description: description,
       inBlock: inBlock,
+      enabled: enabled,
       trailing: YicoreSwitch(
         value: value,
-        onChanged: onChanged,
+        onChanged: enabled ? onChanged : (_) {},
       ),
     );
   }
@@ -51,14 +56,16 @@ class SettingsItem extends StatelessWidget {
     VoidCallback? onTap,
     bool inBlock = false,
     bool showArrow = true,
+    bool enabled = true,
   }) {
     return SettingsItem(
       title: title,
       description: description,
       value: value,
-      onTap: onTap,
+      onTap: enabled ? onTap : null,
       inBlock: inBlock,
       showArrow: showArrow,
+      enabled: enabled,
     );
   }
 
@@ -69,13 +76,15 @@ class SettingsItem extends StatelessWidget {
     VoidCallback? onTap,
     bool inBlock = false,
     bool showArrow = false,
+    bool enabled = true,
   }) {
     return SettingsItem(
       title: title,
       description: description,
-      onTap: onTap,
+      onTap: enabled ? onTap : null,
       inBlock: inBlock,
       showArrow: showArrow,
+      enabled: enabled,
     );
   }
 
@@ -88,16 +97,47 @@ class SettingsItem extends StatelessWidget {
     required double max,
     required ValueChanged<double> onChanged,
     bool inBlock = false,
+    bool enabled = true,
   }) {
     return SettingsItem(
       title: title,
       description: description,
       inBlock: inBlock,
+      enabled: enabled,
       trailing: YicoreSlider(
         value: value,
         min: min,
         max: max,
-        onChanged: onChanged,
+        onChanged: enabled ? onChanged : (_) {},
+      ),
+    );
+  }
+
+  // 便捷构造：分段控制器类型
+  factory SettingsItem.segmented({
+    required String title,
+    String? description,
+    required List<SegmentedItem> items,
+    required String selectedValue,
+    required ValueChanged<String> onChanged,
+    bool inBlock = false,
+    bool showBorder = true,
+    bool enabled = true,
+  }) {
+    return SettingsItem(
+      title: title,
+      description: description,
+      inBlock: inBlock,
+      enabled: enabled,
+      trailing: SizedBox(
+        width: 220,
+        child: YicoreSegmentedControl(
+          size: SegmentedControlSize.small,
+          showBorder: showBorder,
+          items: items,
+          selectedValue: selectedValue,
+          onChanged: enabled ? onChanged : (_) {},
+        ),
       ),
     );
   }
@@ -115,13 +155,15 @@ class SettingsItem extends StatelessWidget {
   }
 
   Widget? _buildTrailing() {
-    final arrow = showArrow ? Icon(Icons.chevron_right, size: 20, color: Colors.grey[400]) : null;
+    final arrowColor = enabled ? Colors.grey[400]! : Colors.grey[300]!;
+    final valueColor = enabled ? Colors.grey[600]! : Colors.grey[400]!;
+    final arrow = showArrow ? Icon(Icons.chevron_right, size: 20, color: arrowColor) : null;
 
     if (value != null) {
       return Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(value!, style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+          Text(value!, style: TextStyle(fontSize: 14, color: valueColor)),
           if (arrow != null) ...[SizedBox(width: 8), arrow],
         ],
       );
@@ -138,7 +180,7 @@ class SettingsItem extends StatelessWidget {
   }
 
   Color? _overlayColor(Set<WidgetState> states) =>
-      (onTap != null && states.contains(WidgetState.pressed))
+      (enabled && onTap != null && states.contains(WidgetState.pressed))
           ? Color(0xFFE2E2E2)
           : Colors.transparent;
 
@@ -146,54 +188,66 @@ class SettingsItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final radius = _radius();
     final trailingWidget = _buildTrailing();
+    
+    // 禁用时的颜色和透明度
+    final titleColor = enabled 
+        ? Colors.black.withValues(alpha: 0.85)
+        : Colors.grey[400]!;
+    final descriptionColor = enabled 
+        ? Colors.grey[600]
+        : Colors.grey[400]!;
+    final opacity = enabled ? 1.0 : 0.5;
 
-    return Material(
-      color: inBlock ? Colors.transparent : Colors.white,
-      shape: radius == null ? null : RoundedRectangleBorder(borderRadius: radius),
-      child: ClipRRect(
-        borderRadius: radius ?? BorderRadius.zero,
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: radius,
-          splashFactory: NoSplash.splashFactory,
-          overlayColor: WidgetStateProperty.resolveWith(_overlayColor),
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        title,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black.withValues(alpha: 0.85),
-                          height: 1.2,
-                        ),
-                      ),
-                      if (description != null) ...[
-                        SizedBox(height: 4),
+    return Opacity(
+      opacity: opacity,
+      child: Material(
+        color: inBlock ? Colors.transparent : Colors.white,
+        shape: radius == null ? null : RoundedRectangleBorder(borderRadius: radius),
+        child: ClipRRect(
+          borderRadius: radius ?? BorderRadius.zero,
+          child: InkWell(
+            onTap: enabled ? onTap : null,
+            borderRadius: radius,
+            splashFactory: NoSplash.splashFactory,
+            overlayColor: WidgetStateProperty.resolveWith(_overlayColor),
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
                         Text(
-                          description!,
+                          title,
                           style: TextStyle(
-                            fontSize: 13,
-                            color: Colors.grey[600],
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: titleColor,
+                            height: 1.2,
                           ),
                         ),
+                        if (description != null) ...[
+                          SizedBox(height: 4),
+                          Text(
+                            description!,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: descriptionColor,
+                            ),
+                          ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
-                ),
-                if (trailingWidget != null) ...[
-                  SizedBox(width: 16),
-                  trailingWidget,
+                  if (trailingWidget != null) ...[
+                    SizedBox(width: 16),
+                    trailingWidget,
+                  ],
                 ],
-              ],
+              ),
             ),
           ),
         ),
@@ -261,6 +315,7 @@ class SettingsBlock extends StatelessWidget {
                 showArrow: child.showArrow,
                 value: child.value,
                 isLastInBlock: isLast,
+                enabled: child.enabled,
               );
             }
             return child;

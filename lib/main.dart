@@ -10,6 +10,8 @@ import 'timepicker.dart';
 import 'fab.dart';
 import 'dropdown.dart';
 import 'schedule_manager.dart';
+import 'appbar.dart';
+import 'segmented_control.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -36,6 +38,10 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
     Schedule(id: '2', name: '课表2'),
   ];
   String? _currentScheduleId = '1';
+  String _selectedSegment = 'type';
+  String _selectedSegmentSmall = 'type';
+  String _selectedSegmentLarge = 'type';
+  String _notificationStyle = 'banner';
 
   @override
   Widget build(BuildContext context) {
@@ -50,6 +56,10 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
                 SizedBox(height: 20),
                 if (_currentIndex == 0) ...[
                   // 基础组件
+                  _buildAppBarDemo(),
+                  SizedBox(height: 50),
+                  _buildSegmentedControlDemo(),
+                  SizedBox(height: 50),
                   _buildSettingsBlockDemo(),
                   SizedBox(height: 50),
                   _buildSliderDemo(),
@@ -123,28 +133,306 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
           ),
         ],
       ),
-      bottomNavigationBar: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: YicoreBottomNavigationBar(
-            currentIndex: _currentIndex,
-            onTap: (index) => setState(() => _currentIndex = index),
-            items: [
-              BottomNavItem(
-                icon: Icons.widgets,
-                label: '基础组件',
+      bottomNavigationBar: YicoreBottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) => setState(() => _currentIndex = index),
+        items: [
+          BottomNavItem(
+            icon: Icons.widgets,
+            label: '基础组件',
+          ),
+          BottomNavItem(
+            icon: Icons.extension,
+            label: '进阶组件',
+          ),
+          BottomNavItem(
+            icon: Icons.workspace_premium,
+            label: '高级组件',
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ================== AppBar 组件演示 ==================
+  Widget _buildAppBarDemo() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionTitle(
+            title: 'AppBar 组件',
+            subtitle: '自定义顶部导航栏样式',
+          ),
+          SizedBox(height: 20),
+          // 基础 AppBar
+          Text(
+            '基础 AppBar',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Colors.black,
+            ),
+          ),
+          SizedBox(height: 12),
+          YicoreAppBar(
+            title: '页面标题',
+            showBackButton: true,
+            onBackPressed: () {
+              Notifications.sonner(
+                context,
+                message: '点击了返回按钮',
+              );
+            },
+          ),
+          SizedBox(height: 24),
+          // 带操作按钮的 AppBar
+          Text(
+            '带操作按钮的 AppBar',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Colors.black,
+            ),
+          ),
+          SizedBox(height: 12),
+          YicoreAppBar(
+            title: '设置',
+            showBackButton: true,
+            onBackPressed: () {
+              Notifications.sonner(
+                context,
+                message: '点击了返回按钮',
+              );
+            },
+            actions: [
+              YicoreAppBarAction(
+                icon: Icons.search,
+                onPressed: () {
+                  Notifications.sonner(
+                    context,
+                    message: '点击了搜索',
+                  );
+                },
               ),
-              BottomNavItem(
-                icon: Icons.extension,
-                label: '进阶组件',
-              ),
-              BottomNavItem(
-                icon: Icons.workspace_premium,
-                label: '高级组件',
+              YicoreAppBarAction(
+                icon: Icons.more_vert,
+                onPressed: () {
+                  Notifications.sonner(
+                    context,
+                    message: '点击了更多',
+                  );
+                },
               ),
             ],
           ),
-        ),
+          SizedBox(height: 24),
+          // 居中标题的 AppBar
+          Text(
+            '居中标题的 AppBar',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Colors.black,
+            ),
+          ),
+          SizedBox(height: 12),
+          YicoreAppBar(
+            title: '个人中心',
+            centerTitle: true,
+            showBackButton: true,
+            onBackPressed: () {
+              Notifications.sonner(
+                context,
+                message: '点击了返回按钮',
+              );
+            },
+            actions: [
+              YicoreAppBarAction(
+                icon: Icons.edit,
+                onPressed: () {
+                  Notifications.sonner(
+                    context,
+                    message: '点击了编辑',
+                  );
+                },
+              ),
+            ],
+          ),
+          SizedBox(height: 24),
+          // 无返回按钮的 AppBar
+          Text(
+            '无返回按钮的 AppBar',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Colors.black,
+            ),
+          ),
+          SizedBox(height: 12),
+          YicoreAppBar(
+            title: '首页',
+            showBackButton: false,
+            actions: [
+              YicoreAppBarAction(
+                icon: Icons.notifications_outlined,
+                onPressed: () {
+                  Notifications.sonner(
+                    context,
+                    message: '点击了通知',
+                  );
+                },
+              ),
+            ],
+          ),
+          SizedBox(height: 24),
+          // 自定义标题的 AppBar
+          Text(
+            '自定义标题的 AppBar',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Colors.black,
+            ),
+          ),
+          SizedBox(height: 12),
+          YicoreAppBar(
+            titleWidget: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.star, size: 20, color: Colors.amber),
+                SizedBox(width: 8),
+                Text(
+                  '收藏',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black,
+                  ),
+                ),
+              ],
+            ),
+            showBackButton: true,
+            onBackPressed: () {
+              Notifications.sonner(
+                context,
+                message: '点击了返回按钮',
+              );
+            },
+            actions: [
+              YicoreAppBarAction(
+                icon: Icons.share,
+                onPressed: () {
+                  Notifications.sonner(
+                    context,
+                    message: '点击了分享',
+                  );
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ================== 切换控制器演示 ==================
+  Widget _buildSegmentedControlDemo() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionTitle(
+            title: '切换控制器',
+            subtitle: '分段控制器组件',
+          ),
+          SizedBox(height: 20),
+          Text(
+            '小尺寸（带边框）',
+            style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+          ),
+          SizedBox(height: 8),
+          YicoreSegmentedControl(
+            size: SegmentedControlSize.small,
+            showBorder: true,
+            items: [
+              SegmentedItem(label: '类型', value: 'type'),
+              SegmentedItem(label: '视图', value: 'view'),
+              SegmentedItem(label: '示例', value: 'example'),
+            ],
+            selectedValue: _selectedSegmentSmall,
+            onChanged: (value) {
+              setState(() {
+                _selectedSegmentSmall = value;
+              });
+              Notifications.sonner(
+                context,
+                message: '小尺寸：已切换到：${value == 'type' ? '类型' : value == 'view' ? '视图' : '示例'}',
+              );
+            },
+          ),
+          SizedBox(height: 16),
+          Text(
+            '中等尺寸（无边框）',
+            style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+          ),
+          SizedBox(height: 8),
+          YicoreSegmentedControl(
+            size: SegmentedControlSize.medium,
+            showBorder: false,
+            items: [
+              SegmentedItem(label: '类型', value: 'type'),
+              SegmentedItem(label: '视图', value: 'view'),
+              SegmentedItem(label: '示例', value: 'example'),
+            ],
+            selectedValue: _selectedSegment,
+            onChanged: (value) {
+              setState(() {
+                _selectedSegment = value;
+              });
+              Notifications.sonner(
+                context,
+                message: '中等尺寸：已切换到：${value == 'type' ? '类型' : value == 'view' ? '视图' : '示例'}',
+              );
+            },
+          ),
+          SizedBox(height: 16),
+          Text(
+            '大尺寸（带边框）',
+            style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+          ),
+          SizedBox(height: 8),
+          YicoreSegmentedControl(
+            size: SegmentedControlSize.large,
+            showBorder: true,
+            items: [
+              SegmentedItem(label: '类型', value: 'type'),
+              SegmentedItem(label: '视图', value: 'view'),
+              SegmentedItem(label: '示例', value: 'example'),
+            ],
+            selectedValue: _selectedSegmentLarge,
+            onChanged: (value) {
+              setState(() {
+                _selectedSegmentLarge = value;
+              });
+              Notifications.sonner(
+                context,
+                message: '大尺寸：已切换到：${value == 'type' ? '类型' : value == 'view' ? '视图' : '示例'}',
+              );
+            },
+          ),
+          SizedBox(height: 20),
+          Center(
+            child: Text(
+              '当前选择（中等）：${_selectedSegment == 'type' ? '类型' : _selectedSegment == 'view' ? '视图' : '示例'}',
+              style: TextStyle(
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -170,6 +458,13 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
                 value: _switchValue,
                 onChanged: (val) => setState(() => _switchValue = val),
               ),
+              SettingsItem.switch_(
+                title: '夜间免打扰',
+                description: '22:00-8:00 期间不接收通知',
+                value: false,
+                onChanged: (_) {},
+                enabled: false,  // 禁用示例
+              ),
               SettingsItem.slider(
                 title: '音量大小',
                 description: '调整通知音量',
@@ -177,6 +472,30 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
                 min: 0,
                 max: 100,
                 onChanged: (val) => setState(() => _sliderValue = val),
+              ),
+              SettingsItem.slider(
+                title: '震动强度',
+                description: '调整震动强度（功能暂未开放）',
+                value: 50,
+                min: 0,
+                max: 100,
+                onChanged: (_) {},
+                enabled: false,  // 禁用示例
+              ),
+              SettingsItem.segmented(
+                title: '通知样式',
+                description: '选择通知显示方式',
+                items: [
+                  SegmentedItem(label: '横幅', value: 'banner'),
+                  SegmentedItem(label: '弹窗', value: 'popup'),
+                  SegmentedItem(label: '静音窗口', value: 'silent'),
+                ],
+                selectedValue: _notificationStyle,
+                onChanged: (value) {
+                  setState(() {
+                    _notificationStyle = value;
+                  });
+                },
               ),
             ],
         ),
@@ -207,6 +526,12 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
                   );
                 },
               ),
+              SettingsItem.value(
+                title: '会员等级',
+                description: '当前会员等级',
+                value: 'VIP',
+                enabled: false,  // 禁用示例
+              ),
               SettingsItem.text(
                 title: '关于我们',
                 description: '查看应用信息和版本',
@@ -217,6 +542,12 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
                     message: 'YIClass v2.1.0\n\n一个课表管理工具，支持多种课程表格式导入，支持多种平台。',
                   );
                 },
+                showArrow: true,
+              ),
+              SettingsItem.text(
+                title: '高级功能',
+                description: '此功能需要会员权限',
+                enabled: false,  // 禁用示例
                 showArrow: true,
               ),
               SettingsItem.text(
