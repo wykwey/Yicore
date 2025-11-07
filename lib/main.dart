@@ -134,23 +134,23 @@ class _ComponentDemoPageState extends State<ComponentDemoPage> {
         ],
       ),
       bottomNavigationBar: YicoreBottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
-        items: [
-          BottomNavItem(
-            icon: Icons.widgets,
-            label: '基础组件',
+            currentIndex: _currentIndex,
+            onTap: (index) => setState(() => _currentIndex = index),
+            items: [
+              BottomNavItem(
+                icon: Icons.widgets,
+                label: '基础组件',
+              ),
+              BottomNavItem(
+                icon: Icons.extension,
+                label: '进阶组件',
+              ),
+              BottomNavItem(
+                icon: Icons.workspace_premium,
+                label: '高级组件',
+              ),
+            ],
           ),
-          BottomNavItem(
-            icon: Icons.extension,
-            label: '进阶组件',
-          ),
-          BottomNavItem(
-            icon: Icons.workspace_premium,
-            label: '高级组件',
-          ),
-        ],
-      ),
     );
   }
 
