@@ -567,6 +567,15 @@ class _BasicComponentsPageState extends State<BasicComponentsPage> {
             subtitle: '自定义按钮样式示例',
           ),
           SizedBox(height: 20),
+          Text(
+            '文字按钮',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Colors.black,
+            ),
+          ),
+          SizedBox(height: 12),
           Wrap(
             spacing: 12,
             runSpacing: 12,
@@ -574,22 +583,139 @@ class _BasicComponentsPageState extends State<BasicComponentsPage> {
             children: [
               YicoreButton(
                 text: '主要按钮',
-                onPressed: () {},
+                onPressed: () {
+                  Notifications.sonner(
+                    context,
+                    message: '点击了主要按钮',
+                  );
+                },
               ),
               YicoreButton(
                 text: '次要按钮',
                 isSecondary: true,
-                onPressed: () {},
+                onPressed: () {
+                  Notifications.sonner(
+                    context,
+                    message: '点击了次要按钮',
+                  );
+                },
               ),
               YicoreButton(
                 text: '轮廓按钮',
                 isOutlined: true,
-                onPressed: () {},
+                onPressed: () {
+                  Notifications.sonner(
+                    context,
+                    message: '点击了轮廓按钮',
+                  );
+                },
               ),
               YicoreButton(
                 text: '加载中',
                 isLoading: true,
                 onPressed: () {},
+              ),
+            ],
+          ),
+          SizedBox(height: 24),
+          Text(
+            '图标按钮（有边框）',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Colors.black,
+            ),
+          ),
+          SizedBox(height: 12),
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            alignment: WrapAlignment.start,
+            children: [
+              YicoreIconButton(
+                icon: Icons.favorite,
+                onPressed: () {
+                  Notifications.sonner(
+                    context,
+                    message: '点击了收藏',
+                  );
+                },
+              ),
+              YicoreIconButton(
+                icon: Icons.share,
+                onPressed: () {
+                  Notifications.sonner(
+                    context,
+                    message: '点击了分享',
+                  );
+                },
+              ),
+              YicoreIconButton(
+                icon: Icons.delete,
+                iconColor: Colors.red,
+                onPressed: () {
+                  Notifications.sonner(
+                    context,
+                    message: '点击了删除',
+                  );
+                },
+              ),
+              YicoreIconButton(
+                icon: Icons.lock,
+                onPressed: null,
+              ),
+            ],
+          ),
+          SizedBox(height: 24),
+          Text(
+            '图标按钮（无边框）',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Colors.black,
+            ),
+          ),
+          SizedBox(height: 12),
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            alignment: WrapAlignment.start,
+            children: [
+              YicoreIconButton(
+                icon: Icons.favorite,
+                showBorder: false,
+                onPressed: () {
+                  Notifications.sonner(
+                    context,
+                    message: '点击了收藏',
+                  );
+                },
+              ),
+              YicoreIconButton(
+                icon: Icons.share,
+                showBorder: false,
+                onPressed: () {
+                  Notifications.sonner(
+                    context,
+                    message: '点击了分享',
+                  );
+                },
+              ),
+              YicoreIconButton(
+                icon: Icons.delete,
+                iconColor: Colors.red,
+                showBorder: false,
+                onPressed: () {
+                  Notifications.sonner(
+                    context,
+                    message: '点击了删除',
+                  );
+                },
+              ),
+              YicoreIconButton(
+                icon: Icons.lock,
+                showBorder: false,
+                onPressed: null,
               ),
             ],
           ),

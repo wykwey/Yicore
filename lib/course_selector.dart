@@ -83,12 +83,6 @@ class _CourseSelectorSheet extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.book_outlined,
-            color: Colors.black.withValues(alpha: 0.85),
-            size: 24,
-          ),
-          const SizedBox(width: 12),
           Expanded(
             child: Text(
               title,
@@ -99,11 +93,11 @@ class _CourseSelectorSheet extends StatelessWidget {
               ),
             ),
           ),
-          IconButton(
+          YicoreIconButton(
+            icon: Icons.close,
+            size: 36,
+            showBorder: true,
             onPressed: () => Navigator.pop(context),
-            icon: Icon(Icons.close, color: Colors.grey[600], size: 24),
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
           ),
         ],
       ),
@@ -177,29 +171,25 @@ class _CourseSelectorSheet extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
-            // 课程名称（可点击区域）
+            // 课程名称（仅显示）
             Expanded(
-              child: GestureDetector(
-                onTap: () => Navigator.pop(context, course.id),
-                behavior: HitTestBehavior.opaque,
-                child: Text(
-                  course.name,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.black,
-                    fontWeight:
-                        isSelected ? FontWeight.w600 : FontWeight.normal,
-                  ),
+              child: Text(
+                course.name,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.black,
+                  fontWeight:
+                      isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
               ),
             ),
             const SizedBox(width: 12),
-            // 编辑按钮（占位）
+            // 编辑按钮
             YicoreButton(
               text: '编辑',
               isOutlined: true,
               onPressed: () {
-                // 占位按钮，暂无功能
+                Navigator.pop(context, course.id);
               },
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             ),

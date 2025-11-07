@@ -22,6 +22,7 @@ class YicoreScheduleManager {
     required List<Schedule> schedules,
     required Function(List<Schedule>) onSchedulesChanged,
     String? currentScheduleId,
+    Function(String)? onCurrentScheduleChanged,
   }) {
     return showDialog(
       context: context,
@@ -30,6 +31,7 @@ class YicoreScheduleManager {
         schedules: schedules,
         onSchedulesChanged: onSchedulesChanged,
         currentScheduleId: currentScheduleId,
+        onCurrentScheduleChanged: onCurrentScheduleChanged,
       ),
     );
   }
@@ -39,11 +41,13 @@ class _ScheduleManagerDialog extends StatefulWidget {
   final List<Schedule> schedules;
   final Function(List<Schedule>) onSchedulesChanged;
   final String? currentScheduleId;
+  final Function(String)? onCurrentScheduleChanged;
 
   const _ScheduleManagerDialog({
     required this.schedules,
     required this.onSchedulesChanged,
     this.currentScheduleId,
+    this.onCurrentScheduleChanged,
   });
 
   @override
@@ -54,12 +58,14 @@ class _ScheduleManagerDialogState extends State<_ScheduleManagerDialog> {
   late List<Schedule> _schedules;
   final TextEditingController _newScheduleController = TextEditingController();
   String? _editingScheduleId;
+  String? _currentScheduleId; // 本地追踪当前选中的课表ID
   final Map<String, TextEditingController> _editControllers = {};
 
   @override
   void initState() {
     super.initState();
     _schedules = List.from(widget.schedules);
+    _currentScheduleId = widget.currentScheduleId; // 初始化当前课表ID
     
     // 为每个课表创建编辑控制器
     for (var schedule in _schedules) {
@@ -179,30 +185,21 @@ class _ScheduleManagerDialogState extends State<_ScheduleManagerDialog> {
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.calendar_today,
-            color: Colors.black.withValues(alpha: 0.85),
-            size: 24,
-          ),
-          const SizedBox(width: 12),
-          const Text(
-            '课表管理',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              color: Colors.black,
+          const Expanded(
+            child: Text(
+              '课表管理',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
+              ),
             ),
           ),
-          const Spacer(),
-          IconButton(
+          YicoreIconButton(
+            icon: Icons.close,
+            size: 36,
+            showBorder: true,
             onPressed: () => Navigator.pop(context),
-            icon: Icon(
-              Icons.close,
-              color: Colors.grey[600],
-              size: 24,
-            ),
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
           ),
         ],
       ),
@@ -296,7 +293,7 @@ class _ScheduleManagerDialogState extends State<_ScheduleManagerDialog> {
       itemBuilder: (context, index) {
         final schedule = _schedules[index];
         final isEditing = _editingScheduleId == schedule.id;
-        final isCurrent = schedule.id == widget.currentScheduleId;
+        final isCurrent = schedule.id == _currentScheduleId; // 使用本地状态
 
         return _buildScheduleItem(schedule, isEditing, isCurrent);
       },
@@ -316,9 +313,23 @@ class _ScheduleManagerDialogState extends State<_ScheduleManagerDialog> {
           width: isCurrent ? 2 : 1,
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Row(
+      child: InkWell(
+        onTap: isEditing ? null : () {
+          if (!isCurrent) {
+            // 更新本地状态以立即刷新UI
+            setState(() {
+              _currentScheduleId = schedule.id;
+            });
+            // 调用回调通知外部
+            if (widget.onCurrentScheduleChanged != null) {
+              widget.onCurrentScheduleChanged!(schedule.id);
+            }
+          }
+        },
+        borderRadius: BorderRadius.circular(8),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
           children: [
             // 图标
             Icon(
@@ -384,7 +395,7 @@ class _ScheduleManagerDialogState extends State<_ScheduleManagerDialog> {
                 constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
               ),
             ] else ...[
-              // 编辑按钮
+              // 编辑按钮（所有课表都显示）
               IconButton(
                 onPressed: () => _startEditing(schedule.id),
                 icon: Icon(Icons.edit_outlined, color: Colors.grey[600]),
@@ -393,19 +404,22 @@ class _ScheduleManagerDialogState extends State<_ScheduleManagerDialog> {
                 constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                 tooltip: '重命名',
               ),
-              const SizedBox(width: 4),
-              // 删除按钮
-              IconButton(
-                onPressed: () => _showDeleteConfirm(schedule),
-                icon: Icon(Icons.delete_outline, color: Colors.red[400]),
-                iconSize: 20,
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                tooltip: '删除',
-              ),
+              // 删除按钮（仅非当前课表显示）
+              if (!isCurrent) ...[
+                const SizedBox(width: 4),
+                IconButton(
+                  onPressed: () => _showDeleteConfirm(schedule),
+                  icon: Icon(Icons.delete_outline, color: Colors.red[400]),
+                  iconSize: 20,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                  tooltip: '删除',
+                ),
+              ],
             ],
           ],
         ),
+      ),
       ),
     );
   }
