@@ -49,7 +49,7 @@ class YicoreAppBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     // 获取状态栏高度
     final statusBarHeight = MediaQuery.of(context).padding.top;
-    
+
     return Container(
       // 总高度 = 状态栏高度 + AppBar 内容高度
       height: statusBarHeight + preferredSize.height,
@@ -94,9 +94,9 @@ class YicoreAppBar extends StatelessWidget implements PreferredSizeWidget {
                 if (actions != null && actions!.isNotEmpty) ...[
                   SizedBox(width: 8),
                   ...actions!.map((action) => Padding(
-                        padding: EdgeInsets.only(left: 8),
-                        child: action,
-                      )),
+                    padding: EdgeInsets.only(left: 8),
+                    child: action,
+                  )),
                 ],
               ],
             ),

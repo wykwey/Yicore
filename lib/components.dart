@@ -44,12 +44,14 @@ class YicoreSlider extends StatelessWidget {
   final double min;
   final double max;
   final ValueChanged<double> onChanged;
+  final double? width;
 
   const YicoreSlider({
     required this.value,
     required this.min,
     required this.max,
     required this.onChanged,
+    this.width,
     Key? key,
   }) : super(key: key);
 
@@ -57,7 +59,7 @@ class YicoreSlider extends StatelessWidget {
   Widget build(BuildContext context) {
     const double trackHeight = 8;
     const double ballSize = 20;
-    const double totalWidth = 250;
+    final double totalWidth = width ?? 250;
 
     double normalized = ((value - min) / (max - min)).clamp(0.0, 1.0);
     // 圆球中心位置
@@ -67,8 +69,8 @@ class YicoreSlider extends StatelessWidget {
 
     return GestureDetector(
       onHorizontalDragUpdate: (details) {
-        final box = context.findRenderObject() as RenderBox;
-        double localX = box.globalToLocal(details.globalPosition).dx;
+        // 使用 localPosition 避免每次拖动都进行全局坐标转换和 RenderObject 查询
+        double localX = details.localPosition.dx;
         // 限制 localX 在有效范围内，防止小球拖出进度条
         localX = localX.clamp(ballSize / 2, totalWidth - ballSize / 2);
         double newValue =
@@ -294,18 +296,22 @@ class YicoreTextField extends StatelessWidget {
   final String? labelText;
   final TextEditingController? controller;
   final ValueChanged<String>? onChanged;
+  final FormFieldValidator<String>? validator;
   final int? maxLines;
   final bool enabled;
   final String? errorText;
+  final TextInputType? keyboardType;
 
   const YicoreTextField({
     this.hintText,
     this.labelText,
     this.controller,
     this.onChanged,
+    this.validator,
     this.maxLines = 1,
     this.enabled = true,
     this.errorText,
+    this.keyboardType,
     Key? key,
   }) : super(key: key);
 
@@ -325,11 +331,13 @@ class YicoreTextField extends StatelessWidget {
           ),
           SizedBox(height: 8),
         ],
-        TextField(
+        TextFormField(
           controller: controller,
           onChanged: onChanged,
+          validator: validator,
           maxLines: maxLines,
           enabled: enabled,
+          keyboardType: keyboardType,
           style: TextStyle(
             fontSize: 16,
             color: enabled ? Colors.black : Colors.grey[400],
