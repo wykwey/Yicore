@@ -15,9 +15,18 @@ class TimeRange {
     required this.endMinute,
   });
 
+  /// 格式化为完整时间范围字符串 "08:00-08:45"
   String format() =>
       '${startHour.toString().padLeft(2, '0')}:${startMinute.toString().padLeft(2, '0')}'
       '-${endHour.toString().padLeft(2, '0')}:${endMinute.toString().padLeft(2, '0')}';
+  
+  /// 格式化开始时间 "08:00"
+  String formatStart() =>
+      '${startHour.toString().padLeft(2, '0')}:${startMinute.toString().padLeft(2, '0')}';
+  
+  /// 格式化结束时间 "08:45"
+  String formatEnd() =>
+      '${endHour.toString().padLeft(2, '0')}:${endMinute.toString().padLeft(2, '0')}';
 }
 
 class YicoreTimeRangePicker {
