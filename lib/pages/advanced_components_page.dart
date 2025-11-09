@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import '../components.dart';
 import '../notifications.dart';
@@ -6,6 +7,9 @@ import '../datepicker.dart';
 import '../timepicker.dart';
 import '../schedule_manager.dart';
 import '../course_selector.dart';
+import '../segmented_control.dart';
+import '../dropdown.dart';
+import '../system_notifications.dart';
 
 // ================== 进阶组件页面 ==================
 class AdvancedComponentsPage extends StatefulWidget {
@@ -29,6 +33,15 @@ class _AdvancedComponentsPageState extends State<AdvancedComponentsPage> {
     CourseItem(id: '3', name: '计算机科学'),
   ];
   String? _currentCourseId = '1';
+  
+  // 分段控制器状态
+  String _selectedSegment = 'type';
+  String _selectedSegmentSmall = 'type';
+  String _selectedSegmentLarge = 'type';
+  
+  // 下拉组件状态
+  String? _selectedLanguage;
+  String? _selectedCountry;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +49,13 @@ class _AdvancedComponentsPageState extends State<AdvancedComponentsPage> {
       child: Column(
         children: [
           SizedBox(height: 20),
+          _buildSegmentedControlDemo(),
+          SizedBox(height: 50),
+          _buildDropdownDemo(),
+          SizedBox(height: 50),
           _buildNotificationDemo(),
+          SizedBox(height: 50),
+          _buildSystemNotificationDemo(),
           SizedBox(height: 50),
           _buildDialogDemo(),
           SizedBox(height: 50),
@@ -404,6 +423,361 @@ class _AdvancedComponentsPageState extends State<AdvancedComponentsPage> {
               ),
             ],
           ),
+        ],
+      ),
+    );
+  }
+
+  // ================== 切换控制器演示 ==================
+  Widget _buildSegmentedControlDemo() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionTitle(
+            title: '切换控制器',
+            subtitle: '分段控制器组件',
+          ),
+          SizedBox(height: 20),
+          Text(
+            '小尺寸（带边框）',
+            style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+          ),
+          SizedBox(height: 8),
+          YicoreSegmentedControl(
+            size: SegmentedControlSize.small,
+            showBorder: true,
+            items: [
+              SegmentedItem(label: '类型', value: 'type'),
+              SegmentedItem(label: '视图', value: 'view'),
+              SegmentedItem(label: '示例', value: 'example'),
+            ],
+            selectedValue: _selectedSegmentSmall,
+            onChanged: (value) {
+              setState(() {
+                _selectedSegmentSmall = value;
+              });
+              Notifications.sonner(
+                context,
+                message: '小尺寸：已切换到：${value == 'type' ? '类型' : value == 'view' ? '视图' : '示例'}',
+              );
+            },
+          ),
+          SizedBox(height: 16),
+          Text(
+            '中等尺寸（无边框）',
+            style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+          ),
+          SizedBox(height: 8),
+          YicoreSegmentedControl(
+            size: SegmentedControlSize.medium,
+            showBorder: false,
+            items: [
+              SegmentedItem(label: '类型', value: 'type'),
+              SegmentedItem(label: '视图', value: 'view'),
+              SegmentedItem(label: '示例', value: 'example'),
+            ],
+            selectedValue: _selectedSegment,
+            onChanged: (value) {
+              setState(() {
+                _selectedSegment = value;
+              });
+              Notifications.sonner(
+                context,
+                message: '中等尺寸：已切换到：${value == 'type' ? '类型' : value == 'view' ? '视图' : '示例'}',
+              );
+            },
+          ),
+          SizedBox(height: 16),
+          Text(
+            '大尺寸（带边框）',
+            style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+          ),
+          SizedBox(height: 8),
+          YicoreSegmentedControl(
+            size: SegmentedControlSize.large,
+            showBorder: true,
+            items: [
+              SegmentedItem(label: '类型', value: 'type'),
+              SegmentedItem(label: '视图', value: 'view'),
+              SegmentedItem(label: '示例', value: 'example'),
+            ],
+            selectedValue: _selectedSegmentLarge,
+            onChanged: (value) {
+              setState(() {
+                _selectedSegmentLarge = value;
+              });
+              Notifications.sonner(
+                context,
+                message: '大尺寸：已切换到：${value == 'type' ? '类型' : value == 'view' ? '视图' : '示例'}',
+              );
+            },
+          ),
+          SizedBox(height: 20),
+          Center(
+            child: Text(
+              '当前选择（中等）：${_selectedSegment == 'type' ? '类型' : _selectedSegment == 'view' ? '视图' : '示例'}',
+              style: TextStyle(
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ================== 下拉组件演示 ==================
+  Widget _buildDropdownDemo() {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionTitle(
+            title: '下拉组件',
+            subtitle: '自定义下拉选择样式',
+          ),
+          SizedBox(height: 20),
+          YicoreDropdown<String>(
+            labelText: '选择语言',
+            hintText: '请选择语言',
+            value: _selectedLanguage,
+            items: [
+              YicoreDropdownItem(
+                value: 'zh',
+                label: '简体中文',
+                icon: Icons.language,
+              ),
+              YicoreDropdownItem(
+                value: 'en',
+                label: 'English',
+                icon: Icons.language,
+              ),
+              YicoreDropdownItem(
+                value: 'ja',
+                label: '日本語',
+                icon: Icons.language,
+              ),
+              YicoreDropdownItem(
+                value: 'ko',
+                label: '한국어',
+                icon: Icons.language,
+              ),
+            ],
+            onChanged: (value) {
+              setState(() {
+                _selectedLanguage = value;
+              });
+              Notifications.sonner(
+                context,
+                message: '已选择: ${value == 'zh' ? '简体中文' : value == 'en' ? 'English' : value == 'ja' ? '日本語' : '한국어'}',
+              );
+            },
+          ),
+          SizedBox(height: 16),
+          YicoreDropdown<String>(
+            labelText: '选择国家',
+            hintText: '请选择国家',
+            value: _selectedCountry,
+            items: [
+              YicoreDropdownItem(
+                value: 'cn',
+                label: '中国',
+                icon: Icons.flag,
+              ),
+              YicoreDropdownItem(
+                value: 'us',
+                label: '美国',
+                icon: Icons.flag,
+              ),
+              YicoreDropdownItem(
+                value: 'jp',
+                label: '日本',
+                icon: Icons.flag,
+              ),
+              YicoreDropdownItem(
+                value: 'kr',
+                label: '韩国',
+                icon: Icons.flag,
+              ),
+            ],
+            onChanged: (value) {
+              setState(() {
+                _selectedCountry = value;
+              });
+              Notifications.sonner(
+                context,
+                message: '已选择国家',
+              );
+            },
+          ),
+          SizedBox(height: 16),
+          YicoreDropdown<String>(
+            labelText: '禁用状态',
+            hintText: '此下拉框已禁用',
+            value: 'zh',
+            enabled: false,
+            items: [
+              YicoreDropdownItem(
+                value: 'zh',
+                label: '简体中文',
+              ),
+              YicoreDropdownItem(
+                value: 'en',
+                label: 'English',
+              ),
+            ],
+            onChanged: (value) {},
+          ),
+          SizedBox(height: 16),
+          YicoreDropdown<String>(
+            labelText: '错误状态',
+            hintText: '请选择选项',
+            errorText: '此字段为必填项',
+            items: [
+              YicoreDropdownItem(
+                value: 'option1',
+                label: '选项1',
+              ),
+              YicoreDropdownItem(
+                value: 'option2',
+                label: '选项2',
+              ),
+            ],
+            onChanged: (value) {},
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ================== 系统通知演示 ==================
+  Widget _buildSystemNotificationDemo() {
+    // 设置 context 供 Web 平台使用
+    systemNotifications.setContext(context);
+    
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionTitle(
+            title: '系统通知',
+            subtitle: kIsWeb 
+                ? '页面内通知（Web）' 
+                : '本地系统通知（Android/iOS/macOS）',
+          ),
+          SizedBox(height: 12),
+          YicoreButton(
+            text: '请求通知权限',
+            onPressed: () async {
+              final granted = await systemNotifications.requestPermission();
+              if (!context.mounted) return;
+              Notifications.sonner(
+                context,
+                title: granted ? '权限已授予' : '权限未授予',
+                message: kIsWeb
+                    ? 'Web 平台无需权限'
+                    : (granted ? '通知权限已成功授予' : '通知权限未授予'),
+              );
+            },
+          ),
+          SizedBox(height: 12),
+          YicoreButton(
+            text: '简单通知',
+            isOutlined: true,
+            onPressed: () async {
+              await systemNotifications.show(
+                id: 1,
+                title: 'Yicore 通知',
+                body: '这是一条通知',
+              );
+              if (!kIsWeb) {
+                if (!context.mounted) return;
+                Notifications.sonner(
+                  context,
+                  title: '已发送',
+                  message: '系统通知已发送',
+                );
+              }
+            },
+          ),
+          SizedBox(height: 12),
+          YicoreButton(
+            text: '定时通知（5秒后）',
+            isOutlined: true,
+            onPressed: () async {
+              Notifications.sonner(
+                context,
+                title: '已设置',
+                message: '通知将在 5 秒后显示',
+              );
+              
+              await systemNotifications.schedule(
+                id: 2,
+                title: 'Yicore 定时通知',
+                body: '这是一条 5 秒前设置的通知',
+                delay: Duration(seconds: 5),
+              );
+            },
+          ),
+          SizedBox(height: 12),
+          YicoreButton(
+            text: '带按钮的定时通知（10秒后）',
+            isOutlined: true,
+            onPressed: () async {
+              Notifications.sonner(
+                context,
+                title: '已设置',
+                message: kIsWeb 
+                    ? '通知将在 10 秒后显示'
+                    : '带按钮的通知将在 10 秒后显示（仅Android）',
+              );
+              
+              await systemNotifications.scheduleWithActions(
+                id: 3,
+                title: 'Yicore 操作通知',
+                body: '这是一条 10 秒前设置的定时操作通知',
+                delay: Duration(seconds: 10),
+              );
+            },
+          ),
+          if (!kIsWeb) ...[
+            SizedBox(height: 12),
+            YicoreButton(
+              text: '即时操作通知',
+              isOutlined: true,
+              onPressed: () async {
+                await systemNotifications.showWithActions(
+                  id: 4,
+                  title: '即时操作通知',
+                  body: '这是一条即时发送的带操作按钮通知',
+                );
+                if (!context.mounted) return;
+                Notifications.sonner(
+                  context,
+                  title: '已发送',
+                  message: '带操作按钮的通知已发送（仅Android）',
+                );
+              },
+            ),
+            SizedBox(height: 12),
+            YicoreButton(
+              text: '清除所有通知',
+              isOutlined: true,
+              onPressed: () async {
+                await systemNotifications.cancelAll();
+                if (!context.mounted) return;
+                Notifications.sonner(
+                  context,
+                  title: '已清除',
+                  message: '所有通知已清除',
+                );
+              },
+            ),
+          ],
         ],
       ),
     );

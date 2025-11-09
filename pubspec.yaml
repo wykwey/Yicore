@@ -1,4 +1,4 @@
-name: Yicore
+name: yicore
 description: Yicore是为 YiClass 课表项目打造的轻量级 Flutter 组件库
 
 version: 1.0.6
@@ -10,6 +10,8 @@ dependencies:
   flutter:
     sdk: flutter
   font_awesome_flutter: ^10.7.0
+  flutter_local_notifications: ^18.0.1
+  timezone: ^0.9.0
 
 
 dev_dependencies:

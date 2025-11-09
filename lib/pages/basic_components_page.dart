@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import '../components.dart';
 import '../cards.dart';
 import '../appbar.dart';
-import '../segmented_control.dart';
 import '../settingscard.dart';
-import '../dropdown.dart';
 import '../notifications.dart';
 import '../dialogs.dart';
+import '../segmented_control.dart';
 
 // ================== 基础组件页面 ==================
 class BasicComponentsPage extends StatefulWidget {
@@ -17,11 +16,6 @@ class BasicComponentsPage extends StatefulWidget {
 class _BasicComponentsPageState extends State<BasicComponentsPage> {
   bool _switchValue = false;
   double _sliderValue = 50.0;
-  String? _selectedLanguage;
-  String? _selectedCountry;
-  String _selectedSegment = 'type';
-  String _selectedSegmentSmall = 'type';
-  String _selectedSegmentLarge = 'type';
   String _notificationStyle = 'banner';
 
   @override
@@ -32,8 +26,6 @@ class _BasicComponentsPageState extends State<BasicComponentsPage> {
           SizedBox(height: 20),
           _buildAppBarDemo(),
           SizedBox(height: 50),
-          _buildSegmentedControlDemo(),
-          SizedBox(height: 50),
           _buildSettingsBlockDemo(),
           SizedBox(height: 50),
           _buildSliderDemo(),
@@ -43,8 +35,6 @@ class _BasicComponentsPageState extends State<BasicComponentsPage> {
           _buildButtonDemo(),
           SizedBox(height: 50),
           _buildTextFieldDemo(),
-          SizedBox(height: 50),
-          _buildDropdownDemo(),
           SizedBox(height: 100),
         ],
       ),
@@ -229,105 +219,6 @@ class _BasicComponentsPageState extends State<BasicComponentsPage> {
     );
   }
 
-  // ================== 切换控制器演示 ==================
-  Widget _buildSegmentedControlDemo() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _SectionTitle(
-            title: '切换控制器',
-            subtitle: '分段控制器组件',
-          ),
-          SizedBox(height: 20),
-          Text(
-            '小尺寸（带边框）',
-            style: TextStyle(fontSize: 13, color: Colors.grey[700]),
-          ),
-          SizedBox(height: 8),
-          YicoreSegmentedControl(
-            size: SegmentedControlSize.small,
-            showBorder: true,
-            items: [
-              SegmentedItem(label: '类型', value: 'type'),
-              SegmentedItem(label: '视图', value: 'view'),
-              SegmentedItem(label: '示例', value: 'example'),
-            ],
-            selectedValue: _selectedSegmentSmall,
-            onChanged: (value) {
-              setState(() {
-                _selectedSegmentSmall = value;
-              });
-              Notifications.sonner(
-                context,
-                message: '小尺寸：已切换到：${value == 'type' ? '类型' : value == 'view' ? '视图' : '示例'}',
-              );
-            },
-          ),
-          SizedBox(height: 16),
-          Text(
-            '中等尺寸（无边框）',
-            style: TextStyle(fontSize: 13, color: Colors.grey[700]),
-          ),
-          SizedBox(height: 8),
-          YicoreSegmentedControl(
-            size: SegmentedControlSize.medium,
-            showBorder: false,
-            items: [
-              SegmentedItem(label: '类型', value: 'type'),
-              SegmentedItem(label: '视图', value: 'view'),
-              SegmentedItem(label: '示例', value: 'example'),
-            ],
-            selectedValue: _selectedSegment,
-            onChanged: (value) {
-              setState(() {
-                _selectedSegment = value;
-              });
-              Notifications.sonner(
-                context,
-                message: '中等尺寸：已切换到：${value == 'type' ? '类型' : value == 'view' ? '视图' : '示例'}',
-              );
-            },
-          ),
-          SizedBox(height: 16),
-          Text(
-            '大尺寸（带边框）',
-            style: TextStyle(fontSize: 13, color: Colors.grey[700]),
-          ),
-          SizedBox(height: 8),
-          YicoreSegmentedControl(
-            size: SegmentedControlSize.large,
-            showBorder: true,
-            items: [
-              SegmentedItem(label: '类型', value: 'type'),
-              SegmentedItem(label: '视图', value: 'view'),
-              SegmentedItem(label: '示例', value: 'example'),
-            ],
-            selectedValue: _selectedSegmentLarge,
-            onChanged: (value) {
-              setState(() {
-                _selectedSegmentLarge = value;
-              });
-              Notifications.sonner(
-                context,
-                message: '大尺寸：已切换到：${value == 'type' ? '类型' : value == 'view' ? '视图' : '示例'}',
-              );
-            },
-          ),
-          SizedBox(height: 20),
-          Center(
-            child: Text(
-              '当前选择（中等）：${_selectedSegment == 'type' ? '类型' : _selectedSegment == 'view' ? '视图' : '示例'}',
-              style: TextStyle(
-                fontSize: 14,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
   // ================== 设置区块演示 ==================
   Widget _buildSettingsBlockDemo() {
@@ -757,130 +648,6 @@ class _BasicComponentsPageState extends State<BasicComponentsPage> {
     );
   }
 
-  // ================== 下拉组件演示 ==================
-  Widget _buildDropdownDemo() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _SectionTitle(
-            title: '下拉组件',
-            subtitle: '自定义下拉选择样式',
-          ),
-          SizedBox(height: 20),
-          YicoreDropdown<String>(
-            labelText: '选择语言',
-            hintText: '请选择语言',
-            value: _selectedLanguage,
-            items: [
-              YicoreDropdownItem(
-                value: 'zh',
-                label: '简体中文',
-                icon: Icons.language,
-              ),
-              YicoreDropdownItem(
-                value: 'en',
-                label: 'English',
-                icon: Icons.language,
-              ),
-              YicoreDropdownItem(
-                value: 'ja',
-                label: '日本語',
-                icon: Icons.language,
-              ),
-              YicoreDropdownItem(
-                value: 'ko',
-                label: '한국어',
-                icon: Icons.language,
-              ),
-            ],
-            onChanged: (value) {
-              setState(() {
-                _selectedLanguage = value;
-              });
-              Notifications.sonner(
-                context,
-                message: '已选择: ${value == 'zh' ? '简体中文' : value == 'en' ? 'English' : value == 'ja' ? '日本語' : '한국어'}',
-              );
-            },
-          ),
-          SizedBox(height: 16),
-          YicoreDropdown<String>(
-            labelText: '选择国家',
-            hintText: '请选择国家',
-            value: _selectedCountry,
-            items: [
-              YicoreDropdownItem(
-                value: 'cn',
-                label: '中国',
-                icon: Icons.flag,
-              ),
-              YicoreDropdownItem(
-                value: 'us',
-                label: '美国',
-                icon: Icons.flag,
-              ),
-              YicoreDropdownItem(
-                value: 'jp',
-                label: '日本',
-                icon: Icons.flag,
-              ),
-              YicoreDropdownItem(
-                value: 'kr',
-                label: '韩国',
-                icon: Icons.flag,
-              ),
-            ],
-            onChanged: (value) {
-              setState(() {
-                _selectedCountry = value;
-              });
-              Notifications.sonner(
-                context,
-                message: '已选择国家',
-              );
-            },
-          ),
-          SizedBox(height: 16),
-          YicoreDropdown<String>(
-            labelText: '禁用状态',
-            hintText: '此下拉框已禁用',
-            value: 'zh',
-            enabled: false,
-            items: [
-              YicoreDropdownItem(
-                value: 'zh',
-                label: '简体中文',
-              ),
-              YicoreDropdownItem(
-                value: 'en',
-                label: 'English',
-              ),
-            ],
-            onChanged: (value) {},
-          ),
-          SizedBox(height: 16),
-          YicoreDropdown<String>(
-            labelText: '错误状态',
-            hintText: '请选择选项',
-            errorText: '此字段为必填项',
-            items: [
-              YicoreDropdownItem(
-                value: 'option1',
-                label: '选项1',
-              ),
-              YicoreDropdownItem(
-                value: 'option2',
-                label: '选项2',
-              ),
-            ],
-            onChanged: (value) {},
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 // ================== 节标题组件 ==================
